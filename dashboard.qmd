@@ -1,0 +1,34 @@
+---
+title: ""
+format:
+  dashboard: 
+    orientation: columns
+---
+
+## Column {width = "35%"}
+
+Placeholder text for column 1
+
+```{r, install_packages}
+#| echo: false
+#| include: false
+library(tidyverse)
+```
+
+```{r, printstarwars}
+head(starwars)
+```
+
+## Column {width = "65%"}
+
+### Row {height = "10%"}
+
+Placeholder text for column 2, row 1
+
+### Row {height = "70%"}
+
+Placeholder text for column 2, row 2
+
+### Row {height = "20%"}
+
+Placeholder text for column 2, row 3

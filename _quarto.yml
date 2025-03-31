@@ -1,0 +1,29 @@
+project:
+  type: website
+
+website:
+  title: "OpenCare"
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - href: index.qmd
+        text: About
+      - href: dashboard.qmd
+        text: Dashboard
+  favicon: "images/oc_logo.png"
+  navbar:
+      logo: "images/oc_logo.png"
+      right:
+      - icon: github
+        href: https://github.com/samhendersonpalmer
+      - icon: linkedin
+        href: https://www.linkedin.com/in/samhendersonpalmer/
+
+format:
+  html:
+    theme: [simplex, custom.scss]
+    toc: true
+
+
+

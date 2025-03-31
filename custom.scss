@@ -1,0 +1,26 @@
+/*-- scss:defaults --*/
+// Base document colors
+$link-color: #d61c1d;
+
+
+// Code blocks
+$code-block-bg-alpha: -.8;
+
+// Logo size
+.navbar-logo {
+  min-height: 50px;
+}
+
+// Adjusting dashboard display
+.quarto-card {
+          padding: 0;
+          border: none !important;
+        }
+        
+// tabsets
+.panel-tabset .nav-item {
+  font-size: 16px;
+  border: none !important;
+}
+
+
