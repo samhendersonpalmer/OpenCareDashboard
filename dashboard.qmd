@@ -16,7 +16,31 @@ library(tidyverse)
 ```
 
 ```{r, printstarwars}
+x <- starwars
 head(starwars)
+```
+
+```{r, sendtoojs}
+#| echo: false
+#| include: false
+ojs_define(service_name = x)
+```
+
+
+```{ojs}
+//| expandable: false
+
+// Transpose data to make it useable in ojs
+service = transpose(service_name)
+
+// Create dropdown menu of the names
+viewof serviceDropdown = Inputs.select(
+  service.map(d => d.name),
+  {
+    label: "Choose a service",
+    unique: true
+    }
+)
 ```
 
 ## Column {width = "65%"}
@@ -25,10 +49,17 @@ head(starwars)
 
 Placeholder text for column 2, row 1
 
-### Row {height = "70%"}
+### Row {height = "90%"}
 
-Placeholder text for column 2, row 2
+```{ojs}
+viewof search = Inputs.search(service, {placeholder: "Type to find a service"})
 
-### Row {height = "20%"}
-
-Placeholder text for column 2, row 3
+viewof items = Inputs.table(search, {
+columns: ["name"],
+header: {name: "Care Service"},
+width: 300, 
+maxHeight: 250,
+required: false,
+value: search, 
+multiple: false})
+```
