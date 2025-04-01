@@ -8,7 +8,7 @@ format:
 
 ## Column {width="20%"}
 
-### Row {height="30%"}
+### Row {height="50%"}
 
 ```{r, install_packages}
 #| echo: false
@@ -34,13 +34,13 @@ viewof items = Inputs.table(search, {
 columns: ["name"],
 header: {name: "Care Service"},
 width: 300,
-height: 100,
+height: 250,
 required: false,
 value: search, 
 multiple: false})
 ```
 
-### Row {height="70%"}
+### Row {height="50%"}
 
 ```{r print}
 head(x)
