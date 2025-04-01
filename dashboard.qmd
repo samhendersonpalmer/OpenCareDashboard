@@ -5,6 +5,11 @@ format:
     orientation: columns
 ---
 
+
+## Column {width="20%"}
+
+### Row {height="30%"}
+
 ```{r, install_packages}
 #| echo: false
 #| include: false
@@ -14,9 +19,6 @@ library(tidyverse)
 ```{r, starwars}
 x <- starwars
 ```
-
-# {.sidebar width="340px"}
-
 ```{r, sendtoojs}
 #| echo: false
 #| include: false
@@ -25,30 +27,29 @@ ojs_define(service_name = x)
 
 ```{ojs}
 viewof search = Inputs.search(service, {placeholder: "Type to find a service",
-width: 150})
+width: 150,
+height: 10})
 
 viewof items = Inputs.table(search, {
 columns: ["name"],
 header: {name: "Care Service"},
-width: 150, 
-maxHeight: 150,
+width: 300,
+height: 100,
 required: false,
 value: search, 
 multiple: false})
 ```
 
+### Row {height="70%"}
 
-Testing text
+```{r print}
+head(x)
+```
 
-# Overview
 
-## Column {width = "65%"}
+## Column {width="80%"}
 
-### Row {height = "10%"}
-
-Placeholder text for column 2, row 1
-
-### Row {height = "90%"}
+### Row {height="10%"}
 
 ```{ojs}
 //| expandable: false
@@ -64,5 +65,19 @@ viewof serviceDropdown = Inputs.select(
     unique: true
     }
 )
+```
+
+### Row {height="70%"}
+
+```{r column_2_row_2}
+library(tidyverse)
+head(cars)
+```
+
+### Row {height="20%"}
+
+```{r column_2_row_3}
+library(tidyverse)
+head(cars)
 ```
 
