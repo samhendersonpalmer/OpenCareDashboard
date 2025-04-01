@@ -1,13 +1,9 @@
 ---
-title: ""
+title: "Dashboard"
 format:
   dashboard: 
     orientation: columns
 ---
-
-## Column {width = "35%"}
-
-Placeholder text for column 1
 
 ```{r, install_packages}
 #| echo: false
@@ -15,10 +11,11 @@ Placeholder text for column 1
 library(tidyverse)
 ```
 
-```{r, printstarwars}
+```{r, starwars}
 x <- starwars
-head(starwars)
 ```
+
+# {.sidebar width="340px"}
 
 ```{r, sendtoojs}
 #| echo: false
@@ -26,6 +23,32 @@ head(starwars)
 ojs_define(service_name = x)
 ```
 
+```{ojs}
+viewof search = Inputs.search(service, {placeholder: "Type to find a service",
+width: 150})
+
+viewof items = Inputs.table(search, {
+columns: ["name"],
+header: {name: "Care Service"},
+width: 150, 
+maxHeight: 150,
+required: false,
+value: search, 
+multiple: false})
+```
+
+
+Testing text
+
+# Overview
+
+## Column {width = "65%"}
+
+### Row {height = "10%"}
+
+Placeholder text for column 2, row 1
+
+### Row {height = "90%"}
 
 ```{ojs}
 //| expandable: false
@@ -43,23 +66,3 @@ viewof serviceDropdown = Inputs.select(
 )
 ```
 
-## Column {width = "65%"}
-
-### Row {height = "10%"}
-
-Placeholder text for column 2, row 1
-
-### Row {height = "90%"}
-
-```{ojs}
-viewof search = Inputs.search(service, {placeholder: "Type to find a service"})
-
-viewof items = Inputs.table(search, {
-columns: ["name"],
-header: {name: "Care Service"},
-width: 300, 
-maxHeight: 250,
-required: false,
-value: search, 
-multiple: false})
-```
