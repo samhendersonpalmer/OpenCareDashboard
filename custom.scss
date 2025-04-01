@@ -2,6 +2,16 @@
 // Base document colors
 $link-color: #d61c1d;
 
+$orange: #ad7237;
+
+input:placeholder-shown {
+  background-color: white;
+}
+
+.html-fill-container .html-fill-item {
+  border-color: white;
+  background-color: white;
+}
 
 // Code blocks
 $code-block-bg-alpha: -.8;
