@@ -19,6 +19,7 @@ library(tidyverse)
 ```{r, starwars}
 x <- starwars
 ```
+
 ```{r, sendtoojs}
 #| echo: false
 #| include: false
@@ -26,6 +27,11 @@ ojs_define(service_name = x)
 ```
 
 ```{ojs}
+//| expandable: false
+
+// Transpose data to make it useable in ojs
+service = transpose(service_name)
+
 viewof search = Inputs.search(service, {placeholder: "Type to find a service",
 width: 150,
 height: 10})
@@ -40,44 +46,112 @@ value: search,
 multiple: false})
 ```
 
+
+```{ojs}
+//| echo: false
+//| output: false
+function return_name() {
+  var name = "Select a service"
+  if(items === null) {
+    return name
+  } else {
+    return items.name
+  }
+}
+
+function filtered_df() {
+  var name = "Select a service"
+  if(items === null) {
+    return name
+  } else {
+    return items
+  }
+}
+```
+
 ### Row {height="50%"}
 
-```{r print}
+```{r, printstarwars}
 head(x)
 ```
 
-
 ## Column {width="80%"}
 
-### Row {height="10%"}
+### Row {height="20%"}
+::: {.valuebox icon="pencil" color="blue"}
+Service name
 
-```{ojs}
-//| expandable: false
+`{ojs} return_name()`
 
-// Transpose data to make it useable in ojs
-service = transpose(service_name)
+subtitle
+:::
 
-// Create dropdown menu of the names
-viewof serviceDropdown = Inputs.select(
-  service.map(d => d.name),
-  {
-    label: "Choose a service",
-    unique: true
-    }
-)
-```
+::: {.valuebox icon="pencil" color="blue"}
+Service name
 
-### Row {height="70%"}
+`{ojs} filtered_df().height`
 
-```{r column_2_row_2}
-library(tidyverse)
-head(cars)
-```
+subtitle
+:::
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df().mass`
+
+subtitle
+:::
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df().hair_color`
+
+subtitle
+:::
 
 ### Row {height="20%"}
 
-```{r column_2_row_3}
-library(tidyverse)
-head(cars)
-```
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df().birth_year`
+
+subtitle
+:::
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df().sex`
+
+subtitle
+:::
+
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df()`
+
+subtitle
+:::
+
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df()`
+
+subtitle
+:::
+
+
+### Row {height="60%"}
+
+`{ojs} filtered_df().name`
+
+`{ojs} return_name()`
+
+
 
