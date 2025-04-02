@@ -1,13 +1,14 @@
 ---
-title: ""
+title: "Dashboard"
 format:
   dashboard: 
     orientation: columns
 ---
 
-## Column {width = "35%"}
 
-Placeholder text for column 1
+## Column {width="20%"}
+
+### Row {height="50%"}
 
 ```{r, install_packages}
 #| echo: false
@@ -15,20 +16,142 @@ Placeholder text for column 1
 library(tidyverse)
 ```
 
-```{r, printstarwars}
-head(starwars)
+```{r, starwars}
+x <- starwars
 ```
 
-## Column {width = "65%"}
+```{r, sendtoojs}
+#| echo: false
+#| include: false
+ojs_define(service_name = x)
+```
 
-### Row {height = "10%"}
+```{ojs}
+//| expandable: false
 
-Placeholder text for column 2, row 1
+// Transpose data to make it useable in ojs
+service = transpose(service_name)
 
-### Row {height = "70%"}
+viewof search = Inputs.search(service, {placeholder: "Type to find a service",
+width: 150,
+height: 10})
 
-Placeholder text for column 2, row 2
+viewof items = Inputs.table(search, {
+columns: ["name"],
+header: {name: "Care Service"},
+width: 300,
+height: 250,
+required: false,
+value: search, 
+multiple: false})
+```
 
-### Row {height = "20%"}
 
-Placeholder text for column 2, row 3
+```{ojs}
+//| echo: false
+//| output: false
+function return_name() {
+  var name = "Select a service"
+  if(items === null) {
+    return name
+  } else {
+    return items.name
+  }
+}
+
+function filtered_df() {
+  var name = "Select a service"
+  if(items === null) {
+    return name
+  } else {
+    return items
+  }
+}
+```
+
+### Row {height="50%"}
+
+```{r, printstarwars}
+head(x)
+```
+
+## Column {width="80%"}
+
+### Row {height="20%"}
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} return_name()`
+
+subtitle
+:::
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df().height`
+
+subtitle
+:::
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df().mass`
+
+subtitle
+:::
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df().hair_color`
+
+subtitle
+:::
+
+### Row {height="20%"}
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df().birth_year`
+
+subtitle
+:::
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df().sex`
+
+subtitle
+:::
+
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df()`
+
+subtitle
+:::
+
+
+::: {.valuebox icon="pencil" color="blue"}
+Service name
+
+`{ojs} filtered_df()`
+
+subtitle
+:::
+
+
+### Row {height="60%"}
+
+`{ojs} filtered_df().name`
+
+`{ojs} return_name()`
+
+
+
