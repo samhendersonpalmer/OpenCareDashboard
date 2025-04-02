@@ -1,11 +1,12 @@
 /*-- scss:defaults --*/
 // Base document colors
-$link-color: #d61c1d;
 
 $orange: #ad7237;
 
 // Code blocks
 $code-block-bg-alpha: -.8;
+
+$callout-color-note: #922592;
 
 // Logo size
 .navbar-logo {
@@ -24,4 +25,19 @@ $code-block-bg-alpha: -.8;
   border: none !important;
 }
 
+// value boxes
+.valuebox .value-box-value {
+  font-size: 20px !important;
+  color: #922592;
+}
+
+.valuebox .bi.bi {
+  color: #922592 !important;
+}
+
+.valuebox .value-box-area .value-box-title {
+  font-size: 20px !important;
+  color: #922592;
+  font-weight: bold;
+}
 
