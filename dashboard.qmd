@@ -16,6 +16,103 @@ format:
 library(tidyverse)
 ```
 
+```{r, load_data}
+#| echo: false
+#| include: false
+
+raw_data <- readRDS("Data/2025-02-28_datastore.rds")
+
+
+cleaned_data <-
+  raw_data %>%
+  # Select relevant columns
+  select(
+    CSNumber,
+    ServiceName,
+    CareService,
+    Subtype,
+    MinGrade,
+    Last_inspection_Date,
+    NumberStaff,
+    Registered_Places,
+    starts_with("KQ"),
+    -ends_with("change"),
+    Complaints_upheld_2425,
+    Enforcements_issued_2425,
+    any_requirements_2425
+  ) %>%
+  # Remove empty service ID numbers
+  filter(CSNumber != "") %>%
+  # Pivot grade categories in order to revalue grades as strings
+  pivot_longer(cols = starts_with("KQ"),
+               names_to = "Key Question",
+               values_to = "Grade") %>%
+  mutate(
+    Grade = case_match(
+      Grade,
+      NA ~ "No grade yet",
+      1 ~ "Unsatisfactory",
+      2 ~ "Weak",
+      3 ~ "Adequate",
+      4 ~ "Good",
+      5 ~ "Very good",
+      6 ~ "Excellent"
+    )
+  ) %>%
+  pivot_wider(names_from = `Key Question`, values_from = "Grade") %>%
+  # Convert encoding to prevent special characters in strings
+  mutate_if(is.character, function(col)
+    iconv(col, to = "UTF-8"))
+
+datastore <- 
+  cleaned_data %>% 
+  mutate(
+    # Custom name for service combining with ID number
+    service = paste0(CSNumber, " - ", ServiceName),
+    # Converting minimum grade to strings too
+    MinGrade = case_match(
+      MinGrade,
+      NA ~ "No grade yet",
+      1 ~ "Unsatisfactory",
+      2 ~ "Weak",
+      3 ~ "Adequate",
+      4 ~ "Good",
+      5 ~ "Very good",
+      6 ~ "Excellent"
+    ),
+    # Convert date fields to dates
+    Last_inspection_Date = as.Date(Last_inspection_Date, format("%d/%m/%Y")),
+    months_since_inspection = interval(Last_inspection_Date, Sys.Date()) %/% months(1),
+    days_since_inspection = ifelse(
+      months_since_inspection < 1,
+      lubridate::time_length(difftime(Sys.Date(), Last_inspection_Date), "days"),
+      NA
+    ),
+    years_since_inspection = lubridate::time_length(difftime(Sys.Date(), Last_inspection_Date), "years"),
+    staff_per_place = ifelse(
+      Registered_Places == 0 |
+        NumberStaff == 0,
+      NA,
+      NumberStaff / Registered_Places
+    )
+  )
+
+# Specify order of grades in minimum grade as factor
+datastore$MinGrade <- factor(
+datastore$MinGrade,
+  levels =  c(
+    "Unsatisfactory",
+    "Weak",
+    "Adequate",
+    "Good",
+    "Very good",
+    "Excellent",
+    "No grade yet"
+  )
+)
+```
+
+
 ```{r, starwars}
 x <- starwars
 ```
