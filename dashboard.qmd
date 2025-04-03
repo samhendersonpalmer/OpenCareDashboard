@@ -16,14 +16,109 @@ format:
 library(tidyverse)
 ```
 
-```{r, starwars}
-x <- starwars
+```{r, load_data}
+#| echo: false
+#| include: false
+
+raw_data <- readRDS("Data/2025-02-28_datastore.rds")
+
+
+cleaned_data <-
+  raw_data %>%
+  # Select relevant columns
+  select(
+    CSNumber,
+    ServiceName,
+    CareService,
+    Subtype,
+    MinGrade,
+    Last_inspection_Date,
+    NumberStaff,
+    Registered_Places,
+    starts_with("KQ"),
+    -ends_with("change"),
+    Complaints_upheld_2425,
+    Enforcements_issued_2425,
+    any_requirements_2425
+  ) %>%
+  # Remove empty service ID numbers
+  filter(CSNumber != "") %>%
+  # Pivot grade categories in order to revalue grades as strings
+  pivot_longer(cols = starts_with("KQ"),
+               names_to = "Key Question",
+               values_to = "Grade") %>%
+  mutate(
+    Grade = case_match(
+      Grade,
+      NA ~ "No grade yet",
+      1 ~ "Unsatisfactory",
+      2 ~ "Weak",
+      3 ~ "Adequate",
+      4 ~ "Good",
+      5 ~ "Very good",
+      6 ~ "Excellent"
+    )
+  ) %>%
+  pivot_wider(names_from = `Key Question`, values_from = "Grade") %>%
+  # Convert encoding to prevent special characters in strings
+  mutate_if(is.character, function(col)
+    iconv(col, to = "UTF-8"))
+
+datastore <- 
+  cleaned_data %>% 
+  mutate(
+    # Custom name for service combining with ID number
+    service = paste0(ServiceName, " - ", CSNumber),
+    # Converting minimum grade to strings too
+    MinGrade = case_match(
+      MinGrade,
+      NA ~ "No grade yet",
+      1 ~ "Unsatisfactory",
+      2 ~ "Weak",
+      3 ~ "Adequate",
+      4 ~ "Good",
+      5 ~ "Very good",
+      6 ~ "Excellent"
+    ),
+    # Convert date fields to dates
+    Last_inspection_Date = as.Date(Last_inspection_Date, format("%d/%m/%Y")),
+    months_since_inspection = interval(Last_inspection_Date, Sys.Date()) %/% months(1),
+    days_since_inspection = ifelse(
+      months_since_inspection < 1,
+      lubridate::time_length(difftime(Sys.Date(), Last_inspection_Date), "days"),
+      NA
+    ),
+    years_since_inspection = lubridate::time_length(difftime(Sys.Date(), Last_inspection_Date), "years"),
+    staff_per_place = ifelse(
+      Registered_Places == 0 |
+        NumberStaff == 0,
+      NA,
+      NumberStaff / Registered_Places
+    )
+  ) |> 
+  # Just 10 services to make loading times quicker for now
+  slice(1:10)
+
+# Specify order of grades in minimum grade as factor
+datastore$MinGrade <- factor(
+datastore$MinGrade,
+  levels =  c(
+    "Unsatisfactory",
+    "Weak",
+    "Adequate",
+    "Good",
+    "Very good",
+    "Excellent",
+    "No grade yet"
+  )
+)
 ```
+
 
 ```{r, sendtoojs}
 #| echo: false
 #| include: false
-ojs_define(service_name = x)
+ojs_define(service_name = datastore)
 ```
 
 ```{ojs}
@@ -37,8 +132,8 @@ width: 150,
 height: 10})
 
 viewof items = Inputs.table(search, {
-columns: ["name"],
-header: {name: "Care Service"},
+columns: ["service"],
+header: {service: "Select:"},
 width: 300,
 height: 250,
 required: false,
@@ -55,7 +150,7 @@ function return_name() {
   if(items === null) {
     return name
   } else {
-    return items.name
+    return items.service
   }
 }
 
@@ -71,77 +166,68 @@ function filtered_df() {
 
 ### Row {height="50%"}
 
-```{r, printstarwars}
-head(x)
-```
+::: {.callout-note appearance="minimal"}
+## Disclaimer
+This dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0. 
+
+
+
+
+[Data source](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore)
+:::
 
 ## Column {width="80%"}
 
 ### Row {height="20%"}
-::: {.valuebox icon="pencil" color="blue"}
-Service name
 
-`{ojs} return_name()`
+::: {.valuebox icon="card-list" color="secondary"}
+Type
 
-subtitle
+`{ojs} filtered_df().CareService`
+
+Comparison type text
 :::
 
-::: {.valuebox icon="pencil" color="blue"}
-Service name
+::: {.valuebox icon="emoji-neutral-fill" color="white"}
+Grade
 
-`{ojs} filtered_df().height`
+`{ojs} filtered_df().MinGrade`
 
-subtitle
+Comparison type text
 :::
 
-::: {.valuebox icon="pencil" color="blue"}
-Service name
+::: {.valuebox icon="calendar-event-fill" color="white"}
+Inspected
 
-`{ojs} filtered_df().mass`
+`{ojs} filtered_df().months_since_inspection`
 
-subtitle
+Comparison type text
 :::
 
-::: {.valuebox icon="pencil" color="blue"}
-Service name
-
-`{ojs} filtered_df().hair_color`
-
-subtitle
-:::
 
 ### Row {height="20%"}
 
-::: {.valuebox icon="pencil" color="blue"}
-Service name
+::: {.valuebox icon="people-fill" color="white"}
+Staff
 
-`{ojs} filtered_df().birth_year`
+`{ojs} filtered_df().staff_per_place`
 
-subtitle
+Comparison type text
 :::
 
-::: {.valuebox icon="pencil" color="blue"}
-Service name
+::: {.valuebox icon="chat-right-dots-fill" color="white"}
+Complaints
 
-`{ojs} filtered_df().sex`
+`{ojs} filtered_df().Complaints_upheld_2425`
 
-subtitle
-:::
-
-
-::: {.valuebox icon="pencil" color="blue"}
-Service name
-
-`{ojs} filtered_df()`
-
-subtitle
+Comparison type text
 :::
 
 
-::: {.valuebox icon="pencil" color="blue"}
-Service name
+::: {.valuebox icon="clipboard2-check-fill" color="white"}
+Requirements
 
-`{ojs} filtered_df()`
+`{ojs} filtered_df().any_requirements_2425`
 
 subtitle
 :::
