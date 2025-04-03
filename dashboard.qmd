@@ -118,19 +118,28 @@ datastore$MinGrade,
 ```{r, sendtoojs}
 #| echo: false
 #| include: false
-ojs_define(service_name = datastore)
+ojs_define(datastore = datastore)
 ```
 
 ```{ojs}
-//| expandable: false
+//| echo: false
+//| output: false
 
-// Transpose data to make it useable in ojs
-service = transpose(service_name)
+// Load tidyverse-equivalent OJS library for later reshaping
+import { aq, op } from '@uwdata/arquero'
 
-viewof search = Inputs.search(service, {placeholder: "Type to find a service",
+// Transpose data to make it useable in ojs inputs
+datastore_transposed = transpose(datastore)
+```
+
+
+```{ojs}
+// Create search box of service names
+viewof search = Inputs.search(datastore_transposed, {placeholder: "Type to find a service",
 width: 150,
 height: 10})
 
+// Create drop down menu of service names
 viewof items = Inputs.table(search, {
 columns: ["service"],
 header: {service: "Select:"},
@@ -145,6 +154,8 @@ multiple: false})
 ```{ojs}
 //| echo: false
 //| output: false
+
+// Create function to output selected service name and return select service if none selected
 function return_name() {
   var name = "Select a service"
   if(items === null) {
@@ -154,6 +165,7 @@ function return_name() {
   }
 }
 
+// Create function to output row of selected service
 function filtered_df() {
   var name = "Select a service"
   if(items === null) {
@@ -238,6 +250,13 @@ subtitle
 `{ojs} filtered_df().name`
 
 `{ojs} return_name()`
+
+
+```{ojs}
+mytable = aq.table(datastore)
+mytable.view()
+```
+
 
 
 
