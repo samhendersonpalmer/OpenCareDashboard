@@ -186,26 +186,77 @@ service_selected = filtered_df()
 ## Disclaimer
 This dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0. 
 
-
-
-
 [Data source](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore)
 :::
 
 ## Column {width="80%"}
 
+```{ojs}
+//| echo: false
+//| output: false
+
+// Use arquero to create dynamic values included in value boxes
+mytable = aq.table(datastore)
+
+// Create filtered table for same service type for comparison calculations
+selected_service_compare = mytable
+  .params({
+  // define parameters
+    selected_CareService: items.CareService,
+    selected_Subtype: items.Subtype
+  })
+  // filter to only include services of the same type
+  .filter((d, $) => op.includes($.selected_CareService, d.CareService) &&
+  op.includes($.selected_Subtype, d.Subtype))
+
+staff_median_count = selected_service_compare 
+ .filter(d => d.staff_per_place > 0)
+  .rollup({
+    count: op.count(),
+    median_staff_per_place: op.median('staff_per_place')
+   })
+   
+   
+staff_median_count   
+  .view()
+  
+  
+staff_median_count
+  .objects()[0].median_staff_per_place
+```
+
 ### Row {height="25%"}
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// NUMBERS OF SERVICES OF SAME TYPE
+number_services_same_type = selected_service_compare
+  .rollup({
+      count: op.count()
+  })
+   .objects()[0].count
+   
+// NUMBERS OF SERVICES WITH NO GRADE
+number_services_same_type_no_grade = selected_service_compare
+ .filter(d => op.includes("No grade yet", d.MinGrade))
+  .rollup({
+      count: op.count()
+  })
+   .objects()[0].count
+```
 
 ::: {.valuebox icon="card-list" color="secondary"}
 Type
 
 <div class="value-box-value">
 
-`{ojs}  service_selected.CareService` test 
+`{ojs}  service_selected.CareService` - `{ojs}  service_selected.Subtype`
 
 </div>
 
-There are `{ojs} service_selected.months_since_inspection` of these services, x have not yet received grades
+There are `{ojs} number_services_same_type` of these services, `{ojs} number_services_same_type_no_grade` have not yet received grades
 
 :::
 
@@ -268,29 +319,6 @@ x% of services of this type that had been inspected had at least one requirement
 
 `{ojs} service_selected_name`
 
-
-```{ojs}
-mytable = aq.table(datastore)
-
-// View filtered table
-check = mytable
-  .params({
-    selected_CareService: items.CareService
-  })
-  .filter((d, $) => op.includes($.selected_CareService, d.CareService))
-  .rollup({
-    count: op.count(),
-    median_staff_per_place: op.median('staff_per_place')
-   })
-   
-   
-check   
-  .view()
-  
-  
-check
-  .objects()[0].median_staff_per_place
-```
 
 
 
