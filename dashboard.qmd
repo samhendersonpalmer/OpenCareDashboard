@@ -165,6 +165,8 @@ function return_name() {
   }
 }
 
+service_name = return_name()
+
 // Create function to output row of selected service
 function filtered_df() {
   var name = "Select a service"
@@ -174,6 +176,8 @@ function filtered_df() {
     return items
   }
 }
+
+datastore_filtered = filtered_df()
 ```
 
 ### Row {height="50%"}
@@ -195,7 +199,7 @@ This dashboard is not affiliated with or supported by the Care Inspectorate. It 
 ::: {.valuebox icon="card-list" color="secondary"}
 Type
 
-`{ojs} filtered_df().CareService`
+`{ojs} datastore_filtered.CareService`
 
 Comparison type text
 :::
@@ -203,7 +207,7 @@ Comparison type text
 ::: {.valuebox icon="emoji-neutral-fill" color="white"}
 Grade
 
-`{ojs} filtered_df().MinGrade`
+`{ojs} datastore_filtered.MinGrade`
 
 Comparison type text
 :::
@@ -211,7 +215,7 @@ Comparison type text
 ::: {.valuebox icon="calendar-event-fill" color="white"}
 Inspected
 
-`{ojs} filtered_df().months_since_inspection`
+`{ojs} datastore_filtered.months_since_inspection`
 
 Comparison type text
 :::
@@ -222,7 +226,7 @@ Comparison type text
 ::: {.valuebox icon="people-fill" color="white"}
 Staff
 
-`{ojs} filtered_df().staff_per_place`
+`{ojs} datastore_filtered.staff_per_place`
 
 Comparison type text
 :::
@@ -230,7 +234,7 @@ Comparison type text
 ::: {.valuebox icon="chat-right-dots-fill" color="white"}
 Complaints
 
-`{ojs} filtered_df().Complaints_upheld_2425`
+`{ojs} datastore_filtered.Complaints_upheld_2425`
 
 Comparison type text
 :::
@@ -239,7 +243,7 @@ Comparison type text
 ::: {.valuebox icon="clipboard2-check-fill" color="white"}
 Requirements
 
-`{ojs} filtered_df().any_requirements_2425`
+`{ojs} datastore_filtered.any_requirements_2425`
 
 subtitle
 :::
@@ -247,9 +251,9 @@ subtitle
 
 ### Row {height="60%"}
 
-`{ojs} filtered_df().name`
+`{ojs} datastore_filtered.service`
 
-`{ojs} return_name()`
+`{ojs} service_name`
 
 
 ```{ojs}
