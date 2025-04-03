@@ -145,7 +145,7 @@ columns: ["service"],
 header: {service: "Select:"},
 width: 300,
 height: 250,
-required: false,
+required: true,
 value: search, 
 multiple: false})
 ```
@@ -162,6 +162,16 @@ function return_name() {
     return name
   } else {
     return items.service
+  }
+}
+
+// Try to create a general purpose handler for nulls as waiting for input
+function null_handler(item) {
+  var name = "Select a service";
+  if (item === null || item === undefined) {
+    return name; // Return default value if item is null or undefined
+  } else {
+    return item; // Return item if it's not null
   }
 }
 
@@ -189,7 +199,7 @@ This dashboard is not affiliated with or supported by the Care Inspectorate. It 
 [Data source](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore)
 :::
 
-## Column {width="80%"}
+# Overview
 
 ```{ojs}
 //| echo: false
@@ -202,30 +212,15 @@ mytable = aq.table(datastore)
 selected_service_compare = mytable
   .params({
   // define parameters
-    selected_CareService: items.CareService,
-    selected_Subtype: items.Subtype
+    selected_CareService: service_selected.CareService,
+    selected_Subtype: service_selected.Subtype
   })
   // filter to only include services of the same type
   .filter((d, $) => op.includes($.selected_CareService, d.CareService) &&
   op.includes($.selected_Subtype, d.Subtype))
-
-staff_median_count = selected_service_compare 
- .filter(d => d.staff_per_place > 0)
-  .rollup({
-    count: op.count(),
-    median_staff_per_place: op.median('staff_per_place')
-   })
-   
-   
-staff_median_count   
-  .view()
-  
-  
-staff_median_count
-  .objects()[0].median_staff_per_place
 ```
 
-### Row {height="25%"}
+### Row 
 
 ```{ojs}
 //| echo: false
@@ -247,7 +242,7 @@ number_services_same_type_no_grade = selected_service_compare
    .objects()[0].count
 ```
 
-::: {.valuebox icon="card-list" color="secondary"}
+::: {.valuebox icon="card-list" color="white"}
 Type
 
 <div class="value-box-value">
@@ -279,7 +274,21 @@ The average (median) time since the last inspection for services of this type is
 :::
 
 
-### Row {height="25%"}
+### Row 
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// MEDIAN STAFF PER REG PLACE
+median_staff = selected_service_compare 
+ .filter(d => d.staff_per_place > 0)
+  .rollup({
+    count: op.count(),
+    median_staff_per_place: op.median('staff_per_place')
+   })
+  .objects()[0].median_staff_per_place
+```
 
 ::: {.valuebox icon="people-fill" color="white"}
 Staff
@@ -290,7 +299,7 @@ Staff
 
 </div>
 
-The average (median) number of staff per registered place for services of this type is x
+The average (median) number of staff per place for services of this type is `{ojs} median_staff`
 :::
 
 ::: {.valuebox icon="chat-right-dots-fill" color="white"}
@@ -313,13 +322,8 @@ x% of services of this type that had been inspected had at least one requirement
 :::
 
 
-### Row {height="50%"}
+# Grades
 
-`{ojs} service_selected.service`
-
-`{ojs} service_selected_name`
-
-
-
+`{ojs} number_services_same_type`
 
 
