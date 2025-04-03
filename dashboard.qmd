@@ -165,7 +165,7 @@ function return_name() {
   }
 }
 
-service_name = return_name()
+service_selected_name = return_name()
 
 // Create function to output row of selected service
 function filtered_df() {
@@ -177,7 +177,7 @@ function filtered_df() {
   }
 }
 
-datastore_filtered = filtered_df()
+service_selected = filtered_df()
 ```
 
 ### Row {height="50%"}
@@ -194,71 +194,102 @@ This dashboard is not affiliated with or supported by the Care Inspectorate. It 
 
 ## Column {width="80%"}
 
-### Row {height="20%"}
+### Row {height="25%"}
 
 ::: {.valuebox icon="card-list" color="secondary"}
 Type
 
-`{ojs} datastore_filtered.CareService`
+<div class="value-box-value">
 
-Comparison type text
+`{ojs}  service_selected.CareService` test 
+
+</div>
+
+There are `{ojs} service_selected.months_since_inspection` of these services, x have not yet received grades
+
 :::
 
 ::: {.valuebox icon="emoji-neutral-fill" color="white"}
 Grade
 
-`{ojs} datastore_filtered.MinGrade`
+`{ojs} service_selected.MinGrade`
 
-Comparison type text
+Same as x% of services of the same type, whilst y% have a higher minimum grade
+
 :::
 
 ::: {.valuebox icon="calendar-event-fill" color="white"}
 Inspected
 
-`{ojs} datastore_filtered.months_since_inspection`
+`{ojs} service_selected.months_since_inspection`
 
-Comparison type text
+The average (median) time since the last inspection for services of this type is x years/months/days
+
 :::
 
 
-### Row {height="20%"}
+### Row {height="25%"}
 
 ::: {.valuebox icon="people-fill" color="white"}
 Staff
 
-`{ojs} datastore_filtered.staff_per_place`
+<div class="value-box-value">
 
-Comparison type text
+`{ojs} service_selected.staff_per_place` per registered place
+
+</div>
+
+The average (median) number of staff per registered place for services of this type is x
 :::
 
 ::: {.valuebox icon="chat-right-dots-fill" color="white"}
 Complaints
 
-`{ojs} datastore_filtered.Complaints_upheld_2425`
+`{ojs} service_selected.Complaints_upheld_2425`
 
-Comparison type text
+x% of services of this type had at least one upheld complaint
+
 :::
 
 
 ::: {.valuebox icon="clipboard2-check-fill" color="white"}
 Requirements
 
-`{ojs} datastore_filtered.any_requirements_2425`
+`{ojs} service_selected.any_requirements_2425`
 
-subtitle
+x% of services of this type that had been inspected had at least one requirement
+
 :::
 
 
-### Row {height="60%"}
+### Row {height="50%"}
 
-`{ojs} datastore_filtered.service`
+`{ojs} service_selected.service`
 
-`{ojs} service_name`
+`{ojs} service_selected_name`
 
 
 ```{ojs}
 mytable = aq.table(datastore)
-mytable.view()
+
+// View filtered table
+check = mytable
+  .params({
+    selected_CareService: items.CareService
+  })
+  .filter((d, $) => op.includes($.selected_CareService, d.CareService))
+  .rollup({
+    count: op.count(),
+    median_staff_per_place: op.median('staff_per_place')
+   })
+   
+   
+check   
+  .view()
+  
+  
+check
+  .objects()[0].median_staff_per_place
 ```
 
 
