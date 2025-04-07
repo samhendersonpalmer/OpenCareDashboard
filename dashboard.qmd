@@ -69,6 +69,8 @@ datastore <-
   mutate(
     # Custom name for service combining with ID number
     service = paste0(ServiceName, " - ", CSNumber),
+    # Keep numeric mingrade for conditional queries
+    MinGrade_numeric = MinGrade,
     # Converting minimum grade to strings too
     MinGrade = case_match(
       MinGrade,
@@ -96,8 +98,9 @@ datastore <-
       NumberStaff / Registered_Places
     )
   ) |> 
-  # Just 10 services to make loading times quicker for now
-  slice(1:10)
+  # Just 5 services of varying grades to make loading times quicker for now
+  group_by(MinGrade_numeric, CareService, Subtype) |> 
+  slice(1:2)
 
 # Specify order of grades in minimum grade as factor
 datastore$MinGrade <- factor(
@@ -118,25 +121,34 @@ datastore$MinGrade,
 ```{r, sendtoojs}
 #| echo: false
 #| include: false
-ojs_define(service_name = datastore)
+ojs_define(datastore = datastore)
 ```
 
 ```{ojs}
-//| expandable: false
+//| echo: false
+//| output: false
 
-// Transpose data to make it useable in ojs
-service = transpose(service_name)
+// Load tidyverse-equivalent OJS library for later reshaping
+import { aq, op } from '@uwdata/arquero'
 
-viewof search = Inputs.search(service, {placeholder: "Type to find a service",
+// Transpose data to make it useable in ojs inputs
+datastore_transposed = transpose(datastore)
+```
+
+
+```{ojs}
+// Create search box of service names
+viewof search = Inputs.search(datastore_transposed, {placeholder: "Type to find a service",
 width: 150,
 height: 10})
 
+// Create drop down menu of service names
 viewof items = Inputs.table(search, {
 columns: ["service"],
 header: {service: "Select:"},
 width: 300,
 height: 250,
-required: false,
+required: true,
 value: search, 
 multiple: false})
 ```
@@ -145,6 +157,8 @@ multiple: false})
 ```{ojs}
 //| echo: false
 //| output: false
+
+// Create function to output selected service name and return select service if none selected
 function return_name() {
   var name = "Select a service"
   if(items === null) {
@@ -154,6 +168,19 @@ function return_name() {
   }
 }
 
+// Try to create a general purpose handler for nulls as waiting for input
+function null_handler(item) {
+  var name = "Select a service";
+  if (item === null || item === undefined) {
+    return name; // Return default value if item is null or undefined
+  } else {
+    return item; // Return item if it's not null
+  }
+}
+
+service_selected_name = return_name()
+
+// Create function to output row of selected service
 function filtered_df() {
   var name = "Select a service"
   if(items === null) {
@@ -162,6 +189,8 @@ function filtered_df() {
     return items
   }
 }
+
+service_selected = filtered_df()
 ```
 
 ### Row {height="50%"}
@@ -170,74 +199,235 @@ function filtered_df() {
 ## Disclaimer
 This dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0. 
 
-
-
-
 [Data source](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore)
 :::
 
-## Column {width="80%"}
+# Overview
 
-### Row {height="20%"}
+```{ojs}
+//| echo: false
+//| output: false
 
-::: {.valuebox icon="card-list" color="secondary"}
+// Use arquero to create dynamic values included in value boxes
+mytable = aq.table(datastore)
+
+// Create filtered table for same service type for comparison calculations
+selected_service_compare = mytable
+  .params({
+  // define parameters
+    selected_CareService: service_selected.CareService,
+    selected_Subtype: service_selected.Subtype
+  })
+  // filter to only include services of the same type
+  .filter((d, $) => op.includes($.selected_CareService, d.CareService) &&
+  op.includes($.selected_Subtype, d.Subtype))
+```
+
+### Row 
+
+::: {.valuebox icon="card-list" color="white"}
 Type
 
-`{ojs} filtered_df().CareService`
+<div class="value-box-value">
 
-Comparison type text
+```{ojs}
+//| echo: false
+//| output: false
+
+// SELECTED SERVICE TYPE
+selected_serv_type  = {
+  if (service_selected.CareService) {
+    return (service_selected.CareService + " - " + service_selected.Subtype);
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+`{ojs}  selected_serv_type`
+
+</div>
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// NUMBERS OF SERVICES OF SAME TYPE
+number_services_same_type = selected_service_compare
+  .rollup({
+      count: op.count()
+  })
+   .objects()[0].count
+   
+// NUMBERS OF SERVICES WITH NO GRADE
+number_services_same_type_no_grade = selected_service_compare
+ .filter(d => op.includes("No grade yet", d.MinGrade))
+  .rollup({
+      count: op.count()
+  })
+   .objects()[0].count
+   
+// TEXT STRING SUBTITLE
+selected_serv_type_subtitle  = {
+  if (service_selected.CareService) {
+    return ( "There are " + number_services_same_type + " of these services, " + number_services_same_type_no_grade + " have not yet received grades" );
+  } else {
+    return "";
+  }
+}
+```
+
+`{ojs} selected_serv_type_subtitle`
+
 :::
 
 ::: {.valuebox icon="emoji-neutral-fill" color="white"}
 Grade
 
-`{ojs} filtered_df().MinGrade`
+<div class="value-box-value">
 
-Comparison type text
+```{ojs}
+//| echo: false
+//| output: false
+
+// SELECTED SERVICE TYPE
+selected_serv_grade  = {
+  if (service_selected.CareService) {
+    return (service_selected.MinGrade);
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+`{ojs} selected_serv_grade`
+
+</div>
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// PERCENTAGE OF SERVICES WITH SAME GRADE
+number_services_same_grade = selected_service_compare
+.params({
+  // define parameters
+    selected_MinGrade: service_selected.MinGrade
+  })
+  // first filter out those that don't have any grades
+  .filter(d  => d.MinGrade_numeric >= 1)
+  // group by each grade
+  .groupby("MinGrade")
+  // calculate counts of services with each mingrade
+  .rollup({
+      count: op.count()
+  })
+  // create new column for proportion of services with each grade
+  .derive({ percent: d => op.round((d.count / op.sum(d.count) || 0)*100) }) // include `|| 0` in case sum is zero
+  // filter out match selected grade
+  .filter((d, $) => op.includes($.selected_MinGrade, d.MinGrade))
+  // pull out percent value
+   .objects()[0].percent
+  
+   
+// PERCENTAGE OF SERVICES WITH HIGHER GRADE
+number_services_higher_grade = selected_service_compare
+.params({
+  // define parameters
+     selected_MinGrade_numeric: service_selected.MinGrade_numeric
+  })
+  // first filter out those that don't have any grades
+  .filter(d  => d.MinGrade_numeric >= 1)
+  // group by each grade
+  .groupby("MinGrade_numeric")
+  // calculate counts of services with each mingrade
+  .rollup({
+      count: op.count()
+  })
+  // create new column for proportion of services with each grade
+  .derive({ percent: d => op.round((d.count / op.sum(d.count) || 0)*100) }) // include `|| 0` in case sum is zero
+  // Ungroup by minimum grade
+  .ungroup()
+  // filter out match selected grade
+  .filter((d, $) => d.MinGrade_numeric > $.selected_MinGrade_numeric)
+  .derive({total: d => op.sum(d.percent)})
+  // pull out total value
+  .object(1).total
+   
+// TEXT STRING SUBTITLE
+selected_serv_grade_subtitle  = {
+  if (service_selected.CareService) {
+    return ( "Same as " + number_services_same_grade + "% of services of the same type, whilst " + number_services_higher_grade + "% have a higher minimum grade" );
+  } else {
+    return "test";
+  }
+}
+```
+
+`{ojs} selected_serv_grade_subtitle`
+
 :::
 
 ::: {.valuebox icon="calendar-event-fill" color="white"}
 Inspected
 
-`{ojs} filtered_df().months_since_inspection`
+`{ojs} service_selected.months_since_inspection`
 
-Comparison type text
+The average (median) time since the last inspection for services of this type is x years/months/days
+
 :::
 
 
-### Row {height="20%"}
+### Row 
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// MEDIAN STAFF PER REG PLACE
+median_staff = selected_service_compare 
+ .filter(d => d.staff_per_place > 0)
+  .rollup({
+    count: op.count(),
+    median_staff_per_place: op.median('staff_per_place')
+   })
+  .objects()[0].median_staff_per_place
+```
 
 ::: {.valuebox icon="people-fill" color="white"}
 Staff
 
-`{ojs} filtered_df().staff_per_place`
+<div class="value-box-value">
 
-Comparison type text
+`{ojs} service_selected.staff_per_place` per registered place
+
+</div>
+
+The average (median) number of staff per place for services of this type is `{ojs} median_staff`
 :::
 
 ::: {.valuebox icon="chat-right-dots-fill" color="white"}
 Complaints
 
-`{ojs} filtered_df().Complaints_upheld_2425`
+`{ojs} service_selected.Complaints_upheld_2425`
 
-Comparison type text
+x% of services of this type had at least one upheld complaint
+
 :::
 
 
 ::: {.valuebox icon="clipboard2-check-fill" color="white"}
 Requirements
 
-`{ojs} filtered_df().any_requirements_2425`
+`{ojs} service_selected.any_requirements_2425`
 
-subtitle
+x% of services of this type that had been inspected had at least one requirement
+
 :::
 
 
-### Row {height="60%"}
+# Grades
 
-`{ojs} filtered_df().name`
-
-`{ojs} return_name()`
-
+`{ojs} number_services_same_type`
 
 
