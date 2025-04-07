@@ -375,10 +375,19 @@ Inspected
 //| echo: false
 //| output: false
 
+// First check if been inspected 
+inspection_check = {
+  if(service_selected.months_since_inspection >=0) {
+    return (service_selected.months_since_inspection + " month(s) since last inspection");
+  } else {
+    return "No inspection yet";
+  }
+}
+
 // SELECTED SERVICE LAST INSPECTION
 selected_serv_last_inspection  = {
   if (service_selected.CareService) {
-    return (service_selected.months_since_inspection + " month(s) since last inspection")
+    return inspection_check; 
   } else {
     return "Select a service";
   }
@@ -408,7 +417,7 @@ median_time_last_inspection = selected_service_compare
 // TEXT STRING SUBTITLE
 selected_serv_last_inspection_subtitle  = {
   if (service_selected.CareService) {
-    return ( "The average (median) time since the last inspection for services of this type is " + median_time_last_inspection + " month(s)" );
+    return "The average (median) time since the last inspection for services of this type is " + median_time_last_inspection + " month(s)";
   } else{
     return "";
   }
