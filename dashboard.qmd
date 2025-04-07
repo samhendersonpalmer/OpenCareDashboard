@@ -69,6 +69,8 @@ datastore <-
   mutate(
     # Custom name for service combining with ID number
     service = paste0(ServiceName, " - ", CSNumber),
+    # Keep numeric mingrade for conditional queries
+    MinGrade_numeric = MinGrade,
     # Converting minimum grade to strings too
     MinGrade = case_match(
       MinGrade,
@@ -97,7 +99,7 @@ datastore <-
     )
   ) |> 
   # Just 10 services to make loading times quicker for now
-  slice(1:10)
+  slice(1:20)
 
 # Specify order of grades in minimum grade as factor
 datastore$MinGrade <- factor(
@@ -222,6 +224,29 @@ selected_service_compare = mytable
 
 ### Row 
 
+::: {.valuebox icon="card-list" color="white"}
+Type
+
+<div class="value-box-value">
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// SELECTED SERVICE TYPE
+selected_serv_type  = {
+  if (service_selected.CareService) {
+    return (service_selected.CareService + " - " + service_selected.Subtype);
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+`{ojs}  selected_serv_type`
+
+</div>
+
 ```{ojs}
 //| echo: false
 //| output: false
@@ -240,27 +265,79 @@ number_services_same_type_no_grade = selected_service_compare
       count: op.count()
   })
    .objects()[0].count
+   
+// TEXT STRING SUBTITLE
+selected_serv_type_subtitle  = {
+  if (service_selected.CareService) {
+    return ( "There are " + number_services_same_type + " of these services, " + number_services_same_type_no_grade + " have not yet received grades" );
+  } else {
+    return "";
+  }
+}
 ```
 
-::: {.valuebox icon="card-list" color="white"}
-Type
-
-<div class="value-box-value">
-
-`{ojs}  service_selected.CareService` - `{ojs}  service_selected.Subtype`
-
-</div>
-
-There are `{ojs} number_services_same_type` of these services, `{ojs} number_services_same_type_no_grade` have not yet received grades
+`{ojs} selected_serv_type_subtitle`
 
 :::
 
 ::: {.valuebox icon="emoji-neutral-fill" color="white"}
 Grade
 
-`{ojs} service_selected.MinGrade`
+<div class="value-box-value">
 
-Same as x% of services of the same type, whilst y% have a higher minimum grade
+```{ojs}
+//| echo: false
+//| output: false
+
+// SELECTED SERVICE TYPE
+selected_serv_grade  = {
+  if (service_selected.CareService) {
+    return (service_selected.MinGrade);
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+`{ojs} selected_serv_grade`
+
+</div>
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// PERCENTAGE OF SERVICES WITH SAME GRADE
+number_services_same_grade = selected_service_compare
+.params({
+  // define parameters
+    selected_MinGrade: service_selected.MinGrade,
+  })
+  .filter((d, $) => op.includes($.selected_MinGrade, d.MinGrade))
+  .rollup({
+      count: op.count()
+  })
+   .objects()[0].count
+   
+// PERCENTAGE OF SERVICES WITH HIGHER GRADE
+number_services_higher_grade = selected_service_compare
+ .filter(d => op.includes("No grade yet", d.MinGrade))
+  .rollup({
+      count: op.count()
+  })
+   .objects()[0].count
+   
+// TEXT STRING SUBTITLE
+selected_serv_grade_subtitle  = {
+  if (service_selected.CareService) {
+    return ( "There are " + number_services_same_type + " of these services, " + number_services_same_type_no_grade + " have not yet received grades" );
+  } else {
+    return "";
+  }
+}
+```
+
+Same as `{ojs} number_services_same_grade` of services of the same type, whilst y% have a higher minimum grade
 
 :::
 
