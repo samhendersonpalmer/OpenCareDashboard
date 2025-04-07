@@ -1,4 +1,4 @@
-@import"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap";.navbar-logo{min-height:50px}.quarto-card{padding:0;border:none !important}.panel-tabset .nav-item{font-size:16px;border:none !important}.valuebox .value-box-value{font-size:20px !important;color:#922592}.valuebox .bi.bi{color:#922592 !important}.valuebox .value-box-area .value-box-title{font-size:20px !important;color:#922592;font-weight:bold}/*!
+@import"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap";.navbar-logo{min-height:50px}.quarto-card{padding:0;border:none !important}.panel-tabset .nav-item{font-size:16px;border:none !important}.valuebox .value-box-value{font-size:20px !important;color:#922592}.valuebox .bi.bi{color:#922592 !important;font-size:100px !important}.valuebox .value-box-area .value-box-title{font-size:20px !important;color:#922592;font-weight:bold}.observablehq--error{display:none}/*!
  * Bootstrap  v5.3.1 (https://getbootstrap.com/)
  * Copyright 2011-2023 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
