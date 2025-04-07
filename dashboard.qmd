@@ -371,7 +371,25 @@ selected_serv_grade_subtitle  = {
 ::: {.valuebox icon="calendar-event-fill" color="white"}
 Inspected
 
-`{ojs} service_selected.months_since_inspection`
+```{ojs}
+//| echo: false
+//| output: false
+
+// SELECTED SERVICE LAST INSPECTION
+selected_serv_inspection  = {
+  if (service_selected.CareService) {
+    return (service_selected.months_since_inspection + " month(s) since last inspection")
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+<div class="value-box-value">
+
+`{ojs} selected_serv_inspection`
+
+</div>
 
 The average (median) time since the last inspection for services of this type is x years/months/days
 
