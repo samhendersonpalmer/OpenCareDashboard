@@ -359,7 +359,7 @@ selected_serv_grade_subtitle  = {
   if (service_selected.CareService) {
     return ( "Same as " + number_services_same_grade + "% of services of the same type, whilst " + number_services_higher_grade + "% have a higher minimum grade" );
   } else {
-    return "test";
+    return "";
   }
 }
 ```
@@ -376,7 +376,7 @@ Inspected
 //| output: false
 
 // SELECTED SERVICE LAST INSPECTION
-selected_serv_inspection  = {
+selected_serv_last_inspection  = {
   if (service_selected.CareService) {
     return (service_selected.months_since_inspection + " month(s) since last inspection")
   } else {
@@ -387,11 +387,35 @@ selected_serv_inspection  = {
 
 <div class="value-box-value">
 
-`{ojs} selected_serv_inspection`
+`{ojs} selected_serv_last_inspection`
 
 </div>
 
-The average (median) time since the last inspection for services of this type is x years/months/days
+```{ojs}
+//| echo: false
+//| output: false
+
+// MEDIAN TIME SINCE LAST INSPECTION
+median_time_last_inspection = selected_service_compare 
+  // filter out those that haven't yet been inspected
+ .filter(d => d.months_since_inspection >= 0)
+  .rollup({
+    count: op.count(),
+    median_months_since_inspection: op.median('months_since_inspection')
+   })
+   .objects()[0].median_months_since_inspection
+   
+// TEXT STRING SUBTITLE
+selected_serv_last_inspection_subtitle  = {
+  if (service_selected.CareService) {
+    return ( "The average (median) time since the last inspection for services of this type is " + median_time_last_inspection + " month(s)" );
+  } else{
+    return "";
+  }
+}
+```
+
+`{ojs} selected_serv_last_inspection_subtitle`
 
 :::
 
