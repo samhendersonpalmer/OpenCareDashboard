@@ -98,8 +98,9 @@ datastore <-
       NumberStaff / Registered_Places
     )
   ) |> 
-  # Just 10 services to make loading times quicker for now
-  slice(1:20)
+  # Just 5 services of varying grades to make loading times quicker for now
+  group_by(MinGrade_numeric, CareService, Subtype) |> 
+  slice(1:2)
 
 # Specify order of grades in minimum grade as factor
 datastore$MinGrade <- factor(
@@ -311,33 +312,59 @@ selected_serv_grade  = {
 number_services_same_grade = selected_service_compare
 .params({
   // define parameters
-    selected_MinGrade: service_selected.MinGrade,
+    selected_MinGrade: service_selected.MinGrade
   })
-  .filter((d, $) => op.includes($.selected_MinGrade, d.MinGrade))
+  // first filter out those that don't have any grades
+  .filter(d  => d.MinGrade_numeric >= 1)
+  // group by each grade
+  .groupby("MinGrade")
+  // calculate counts of services with each mingrade
   .rollup({
       count: op.count()
   })
-   .objects()[0].count
+  // create new column for proportion of services with each grade
+  .derive({ percent: d => op.round((d.count / op.sum(d.count) || 0)*100) }) // include `|| 0` in case sum is zero
+  // filter out match selected grade
+  .filter((d, $) => op.includes($.selected_MinGrade, d.MinGrade))
+  // pull out percent value
+   .objects()[0].percent
+  
    
 // PERCENTAGE OF SERVICES WITH HIGHER GRADE
 number_services_higher_grade = selected_service_compare
- .filter(d => op.includes("No grade yet", d.MinGrade))
+.params({
+  // define parameters
+     selected_MinGrade_numeric: service_selected.MinGrade_numeric
+  })
+  // first filter out those that don't have any grades
+  .filter(d  => d.MinGrade_numeric >= 1)
+  // group by each grade
+  .groupby("MinGrade_numeric")
+  // calculate counts of services with each mingrade
   .rollup({
       count: op.count()
   })
-   .objects()[0].count
+  // create new column for proportion of services with each grade
+  .derive({ percent: d => op.round((d.count / op.sum(d.count) || 0)*100) }) // include `|| 0` in case sum is zero
+  // Ungroup by minimum grade
+  .ungroup()
+  // filter out match selected grade
+  .filter((d, $) => d.MinGrade_numeric > $.selected_MinGrade_numeric)
+  .derive({total: d => op.sum(d.percent)})
+  // pull out total value
+  .object(1).total
    
 // TEXT STRING SUBTITLE
 selected_serv_grade_subtitle  = {
   if (service_selected.CareService) {
-    return ( "There are " + number_services_same_type + " of these services, " + number_services_same_type_no_grade + " have not yet received grades" );
+    return ( "Same as " + number_services_same_grade + "% of services of the same type, whilst " + number_services_higher_grade + "% have a higher minimum grade" );
   } else {
-    return "";
+    return "test";
   }
 }
 ```
 
-Same as `{ojs} number_services_same_grade` of services of the same type, whilst y% have a higher minimum grade
+`{ojs} selected_serv_grade_subtitle`
 
 :::
 
