@@ -37,9 +37,9 @@ cleaned_data <-
     Registered_Places,
     starts_with("KQ"),
     -ends_with("change"),
-    Complaints_upheld_2425,
-    Enforcements_issued_2425,
-    any_requirements_2425
+    starts_with("Complaints_upheld_"),
+    starts_with("Enforcements_issued_"),
+    starts_with("any_requirements_")
   ) %>%
   # Remove empty service ID numbers
   filter(CSNumber != "") %>%
@@ -95,7 +95,7 @@ datastore <-
       Registered_Places == 0 |
         NumberStaff == 0,
       NA,
-      NumberStaff / Registered_Places
+      round(NumberStaff / Registered_Places, 1)
     )
   ) |> 
   # Just 5 services of varying grades to make loading times quicker for now
@@ -431,6 +431,39 @@ selected_serv_last_inspection_subtitle  = {
 
 ### Row 
 
+
+::: {.valuebox icon="people-fill" color="white"}
+Staff
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// First check they have staff
+staff_check = {
+  if(service_selected.staff_per_place >=0) {
+    return (service_selected.staff_per_place + " staff per registered place");
+  } else {
+    return "No staff recorded";
+  }
+}
+
+// SELECTED SERVICE LAST INSPECTION
+staff_per_place  = {
+  if (service_selected.CareService) {
+    return staff_check; 
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+<div class="value-box-value">
+
+`{ojs} staff_per_place `
+
+</div>
+
 ```{ojs}
 //| echo: false
 //| output: false
@@ -443,18 +476,20 @@ median_staff = selected_service_compare
     median_staff_per_place: op.median('staff_per_place')
    })
   .objects()[0].median_staff_per_place
+  
+// TEXT STRING SUBTITLE
+median_staff_subtitle  = {
+  if (service_selected.CareService) {
+    return "The average (median) number of staff per registered place for services of this type is " + median_staff;
+  } else{
+    return "";
+  }
+}
 ```
 
-::: {.valuebox icon="people-fill" color="white"}
-Staff
+`{ojs} median_staff_subtitle`
 
-<div class="value-box-value">
 
-`{ojs} service_selected.staff_per_place` per registered place
-
-</div>
-
-The average (median) number of staff per place for services of this type is `{ojs} median_staff`
 :::
 
 ::: {.valuebox icon="chat-right-dots-fill" color="white"}
