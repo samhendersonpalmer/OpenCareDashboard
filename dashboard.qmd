@@ -128,8 +128,9 @@ ojs_define(datastore = datastore)
 //| echo: false
 //| output: false
 
-// Load tidyverse-equivalent OJS library for later reshaping
+// Load tidyverse-equivalent OJS library for later reshaping and visualising
 import { aq, op } from '@uwdata/arquero'
+import { Plot } from "@observablehq/plot"
 
 // Transpose data to make it useable in ojs inputs
 datastore_transposed = transpose(datastore)
@@ -679,6 +680,36 @@ requirements_subtitle  = {
 
 # Grades
 
-`{ojs} number_services_same_type`
+
+```{ojs}
+
+// Grade levels (in order)
+grades = ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent", "No grade yet"]
+
+// Mapping KQ codes to readable labels
+kq_map = [{
+  KQ_Support_Wellbeing: "How well do we support people’s wellbeing?",
+  KQ_Staff_Team: "How good is our staff team?",
+  KQ_Setting: "How good is our setting?",
+  KQ_Leadership: "How good is our leadership?",
+  KQ_Care_Play_and_Learning: "How good is our care, play and learning?",
+  KQ_Care_and_Support_Planning: "How well is our care and support planned?"}]
+  
+// --- 1. Selected Service Plot Data ---
+selected_wrangled = aq.from([service_selected]) // Wrap in array because service_selected is one row
+  .fold(Object.keys(service_selected).filter(d => d.startsWith("KQ")), { as: ["kq", "grade"] })
+  .groupby("kq", "grade")
+  .rollup({ count: op.count() })
+  .ungroup("grade")
+  .derive({
+    kq_label: (d) => op.recode(d.kq,{ 'KQ_Setting': 'How good is our setting?', 'opt:b': 'B' } , '?')
+  })
+  
+  
+  
+```
+
+
+`{ojs} selected_wrangled.view()`
 
 
