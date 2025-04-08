@@ -37,9 +37,9 @@ cleaned_data <-
     Registered_Places,
     starts_with("KQ"),
     -ends_with("change"),
-    Complaints_upheld_2425,
-    Enforcements_issued_2425,
-    any_requirements_2425
+    starts_with("Complaints_upheld_"),
+    starts_with("Enforcements_issued_"),
+    starts_with("any_requirements_")
   ) %>%
   # Remove empty service ID numbers
   filter(CSNumber != "") %>%
@@ -168,16 +168,6 @@ function return_name() {
   }
 }
 
-// Try to create a general purpose handler for nulls as waiting for input
-function null_handler(item) {
-  var name = "Select a service";
-  if (item === null || item === undefined) {
-    return name; // Return default value if item is null or undefined
-  } else {
-    return item; // Return item if it's not null
-  }
-}
-
 service_selected_name = return_name()
 
 // Create function to output row of selected service
@@ -226,7 +216,9 @@ selected_service_compare = mytable
 ### Row 
 
 ::: {.valuebox icon="card-list" color="white"}
-Type
+<div class="value-box-title">
+Service type
+</div>
 
 <div class="value-box-value">
 
@@ -234,10 +226,21 @@ Type
 //| echo: false
 //| output: false
 
+
+// Check if subtype blank
+service_name_check = {
+ if(service_selected.Subtype === "") {
+   return service_selected.CareService;
+    } else {
+    return (service_selected.CareService + " - " + service_selected.Subtype);
+  }
+}
+
+
 // SELECTED SERVICE TYPE
 selected_serv_type  = {
   if (service_selected.CareService) {
-    return (service_selected.CareService + " - " + service_selected.Subtype);
+    return service_name_check;
   } else {
     return "Select a service";
   }
@@ -282,7 +285,9 @@ selected_serv_type_subtitle  = {
 :::
 
 ::: {.valuebox icon="emoji-neutral-fill" color="white"}
-Grade
+<div class="value-box-title">
+Lowest grade
+</div>
 
 <div class="value-box-value">
 
@@ -309,7 +314,7 @@ selected_serv_grade  = {
 //| output: false
 
 // PERCENTAGE OF SERVICES WITH SAME GRADE
-number_services_same_grade = selected_service_compare
+perc_services_same_grade = selected_service_compare
 .params({
   // define parameters
     selected_MinGrade: service_selected.MinGrade
@@ -331,7 +336,7 @@ number_services_same_grade = selected_service_compare
   
    
 // PERCENTAGE OF SERVICES WITH HIGHER GRADE
-number_services_higher_grade = selected_service_compare
+perc_services_higher_grade = selected_service_compare
 .params({
   // define parameters
      selected_MinGrade_numeric: service_selected.MinGrade_numeric
@@ -357,9 +362,9 @@ number_services_higher_grade = selected_service_compare
 // TEXT STRING SUBTITLE
 selected_serv_grade_subtitle  = {
   if (service_selected.CareService) {
-    return ( "Same as " + number_services_same_grade + "% of services of the same type, whilst " + number_services_higher_grade + "% have a higher minimum grade" );
+    return ( "Same as " + perc_services_same_grade + "% of services of the same type, whilst " + perc_services_higher_grade + "% have a higher minimum grade" );
   } else {
-    return "test";
+    return "";
   }
 }
 ```
@@ -369,16 +374,105 @@ selected_serv_grade_subtitle  = {
 :::
 
 ::: {.valuebox icon="calendar-event-fill" color="white"}
-Inspected
+<div class="value-box-title">
+Last inspected
+</div>
 
-`{ojs} service_selected.months_since_inspection`
+```{ojs}
+//| echo: false
+//| output: false
 
-The average (median) time since the last inspection for services of this type is x years/months/days
+// First check if been inspected 
+inspection_check = {
+  if(service_selected.months_since_inspection >=0) {
+    return (service_selected.months_since_inspection + " month(s) since last inspection");
+  } else {
+    return "No inspection yet";
+  }
+}
+
+// SELECTED SERVICE LAST INSPECTION
+selected_serv_last_inspection  = {
+  if (service_selected.CareService) {
+    return inspection_check; 
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+<div class="value-box-value">
+
+`{ojs} selected_serv_last_inspection`
+
+</div>
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// MEDIAN TIME SINCE LAST INSPECTION
+median_time_last_inspection = selected_service_compare 
+  // filter out those that haven't yet been inspected
+ .filter(d => d.months_since_inspection >= 0)
+  .rollup({
+    count: op.count(),
+    median_months_since_inspection: op.median('months_since_inspection')
+   })
+   .objects()[0].median_months_since_inspection
+   
+// TEXT STRING SUBTITLE
+selected_serv_last_inspection_subtitle  = {
+  if (service_selected.CareService) {
+    return "The average (median) time since the last inspection for services of this type is " + median_time_last_inspection + " month(s)";
+  } else{
+    return "";
+  }
+}
+```
+
+`{ojs} selected_serv_last_inspection_subtitle`
 
 :::
 
 
 ### Row 
+
+
+::: {.valuebox icon="people-fill" color="white"}
+
+<div class="value-box-title">
+Number of staff
+</div>
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// First check they have staff
+staff_check = {
+  if(service_selected.staff_per_place >=0) {
+    return (service_selected.staff_per_place.toFixed(2) + " staff per registered place");
+  } else {
+    return "No staff recorded";
+  }
+}
+
+// SELECTED SERVICE LAST INSPECTION
+staff_per_place  = {
+  if (service_selected.CareService) {
+    return staff_check; 
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+<div class="value-box-value">
+
+`{ojs} staff_per_place `
+
+</div>
 
 ```{ojs}
 //| echo: false
@@ -391,37 +485,194 @@ median_staff = selected_service_compare
     count: op.count(),
     median_staff_per_place: op.median('staff_per_place')
    })
-  .objects()[0].median_staff_per_place
+  .objects()[0]?.median_staff_per_place ?? "No staff recorded"
+  
+  
+// First check for those that are undefined as all services have had no complaints
+staff_undefined_check = {
+  if(median_staff !== "No staff recorded"){
+    return "The average (median) number of staff per registered place for services of this type is " + median_staff.toFixed(2);
+  } else {
+    return "No services of this type had any staff recorded";
+  }
+}
+  
+// TEXT STRING SUBTITLE
+median_staff_subtitle  = {
+  if (service_selected.CareService) {
+    return staff_undefined_check;
+  } else{
+    return "";
+  }
+}
 ```
 
-::: {.valuebox icon="people-fill" color="white"}
-Staff
+`{ojs} median_staff_subtitle`
 
-<div class="value-box-value">
-
-`{ojs} service_selected.staff_per_place` per registered place
-
-</div>
-
-The average (median) number of staff per place for services of this type is `{ojs} median_staff`
 :::
 
 ::: {.valuebox icon="chat-right-dots-fill" color="white"}
-Complaints
 
-`{ojs} service_selected.Complaints_upheld_2425`
+<div class="value-box-title">
+Upheld complaints
+</div>
 
-x% of services of this type had at least one upheld complaint
+```{ojs}
+//| echo: false
+//| output: false
+
+// First check there were complaints in year 2425
+complaints_check = {
+  if(service_selected.Complaints_upheld_2425 >=0) {
+    return (service_selected.Complaints_upheld_2425 + " upheld complaint(s) between 1 April 2024 and 31 March 2025");
+  } else {
+    return "No upheld complaints between 1 April 2024 and 31 March 2025";
+  }
+}
+
+// SELECTED SERVICE COMPLAINTS
+complaints  = {
+  if (service_selected.CareService) {
+    return complaints_check ; 
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+<div class="value-box-value">
+
+`{ojs} complaints`
+
+</div>
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// PERCENTAGE OF SERVICES WITH ATLEAST 1 UPHELD COMPLAINT
+perc_services_complaint = selected_service_compare
+  // group by each grade
+  .groupby("Complaints_upheld_2425")
+  // calculate counts of services with all the varying numbers of upheld complaints
+  .rollup({
+      count: op.count()
+  })
+  // create new column for proportion of services with each number of complaints
+  .derive({ percent: d => op.round((d.count / op.sum(d.count) || 0)*100) }) // include `|| 0` in case sum is zero
+  // Ungroup by number of complaints
+  .ungroup()
+  // filter out anything less than 1
+  .filter((d) => d.Complaints_upheld_2425 >= 1)
+  .derive({total: d => op.sum(d.percent)})
+  // pull out total value
+  .objects()[0]?.total ?? 0
+
+// First check for those that are undefined as all services have had no complaints
+complaints_undefined_check = {
+  if(perc_services_complaint !== 0){
+    return perc_services_complaint + "% of services of this type had at least one upheld complaint between 1 April 2024 and 31 March 2025";
+  } else {
+    return "No services of this type had at least one upheld complaint between 1 April 2024 and 31 March 2025";
+  }
+}
+  
+// TEXT STRING SUBTITLE
+complaints_subtitle  = {
+  if (service_selected.CareService) {
+    return complaints_undefined_check;
+  } else{
+    return "";
+  }
+}
+```
+
+`{ojs} complaints_subtitle`
 
 :::
 
 
 ::: {.valuebox icon="clipboard2-check-fill" color="white"}
-Requirements
 
-`{ojs} service_selected.any_requirements_2425`
+<div class="value-box-title">
+Requirements from inspection
+</div>
 
-x% of services of this type that had been inspected had at least one requirement
+```{ojs}
+//| echo: false
+//| output: false
+
+// First check there were requirements in year 2425
+requirements_check = {
+  if(service_selected.any_requirements_2425 === "Yes") {
+    return ("This service had requirement(s) from inspections between 1 April 2024 and 31 March 2025");
+  } else  if(service_selected.any_requirements_2425 === "Inspected but no requirements") {
+    return "This service had no requirement(s) from inspections between 1 April 2024 and 31 March 2025";
+  } else {
+  return "This service was not inspected between 1 April 2024 and 31 March 2025"
+  }
+}
+
+// SELECTED SERVICE REQUIREMENTS
+requirements  = {
+  if (service_selected.CareService) {
+    return requirements_check ; 
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+<div class="value-box-value">
+
+`{ojs} requirements`
+
+</div>
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// PERCENTAGE OF SERVICES WITH ATLEAST 1 REQUIREMENT (OF THOSE THAT HAD BEEN INSPECTED)
+perc_services_requirement = selected_service_compare
+  // First filter out those that have not been inspected (i.e. blank field)
+  .filter((d) => d.any_requirements_2425 !== "")
+  // group by each grade
+  .groupby("any_requirements_2425")
+  // calculate counts of services with all the varying categories of requirements (yes, inspected but none, and blank)
+  .rollup({
+      count: op.count()
+  })
+  // create new column for proportion of services with each number of requirements
+  .derive({ percent: d => op.round((d.count / op.sum(d.count) || 0)*100) }) // include `|| 0` in case sum is zero
+  // Ungroup by number of requirements
+  .ungroup()
+  // filter only those that are "Yes"
+  .filter((d) => d.any_requirements_2425 === "Yes")
+  .derive({total: d => op.sum(d.percent)})
+  // pull out total value
+  .objects()[0]?.total ?? 0
+
+// First check for those that are undefined as all services have had no complaints
+requirements_undefined_check = {
+  if(perc_services_requirement !== 0){
+    return perc_services_requirement + "% of services of this type that had been inspected between 1 April 2024 and 31 March 2025 had at least one requirement";
+  } else {
+    return "No services of this type that had been inspected between 1 April 2024 and 31 March 2025 had any requirements";
+  }
+}
+  
+// TEXT STRING SUBTITLE
+requirements_subtitle  = {
+  if (service_selected.CareService) {
+    return requirements_undefined_check;
+  } else{
+    return "";
+  }
+}
+```
+
+`{ojs} requirements_subtitle`
 
 :::
 
