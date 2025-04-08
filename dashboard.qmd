@@ -433,6 +433,7 @@ selected_serv_last_inspection_subtitle  = {
 
 
 ::: {.valuebox icon="people-fill" color="white"}
+
 Staff
 
 ```{ojs}
@@ -475,12 +476,22 @@ median_staff = selected_service_compare
     count: op.count(),
     median_staff_per_place: op.median('staff_per_place')
    })
-  .objects()[0].median_staff_per_place
+  .objects()[0]?.median_staff_per_place ?? "No staff recorded"
+  
+  
+// First check for those that are undefined as all services have had no complaints
+staff_undefined_check = {
+  if(median_staff !== "No staff recorded"){
+    return "The average (median) number of staff per registered place for services of this type is " + median_staff.toFixed(2);
+  } else {
+    return "No services of this type had any staff recorded";
+  }
+}
   
 // TEXT STRING SUBTITLE
 median_staff_subtitle  = {
   if (service_selected.CareService) {
-    return "The average (median) number of staff per registered place for services of this type is " + median_staff.toFixed(2);
+    return staff_undefined_check;
   } else{
     return "";
   }
@@ -543,22 +554,21 @@ perc_services_complaint = selected_service_compare
   .filter((d) => d.Complaints_upheld_2425 >= 1)
   .derive({total: d => op.sum(d.percent)})
   // pull out total value
-  .objects()[0].total
+  .objects()[0]?.total ?? 0
 
 // First check for those that are undefined as all services have had no complaints
 complaints_undefined_check = {
-  if(perc_services_complaint) {
+  if(perc_services_complaint !== 0){
     return perc_services_complaint + "% of services of this type had at least one upheld complaint between 1 April 2024 and 31 March 2025";
   } else {
     return "No services of this type had at least one upheld complaint between 1 April 2024 and 31 March 2025";
   }
 }
   
-  
 // TEXT STRING SUBTITLE
 complaints_subtitle  = {
   if (service_selected.CareService) {
-    return perc_services_complaint + "% of services of this type had at least one upheld complaint between 1 April 2024 and 31 March 2025";
+    return complaints_undefined_check;
   } else{
     return "";
   }
