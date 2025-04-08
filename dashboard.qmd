@@ -686,24 +686,15 @@ requirements_subtitle  = {
 // Grade levels (in order)
 grades = ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent", "No grade yet"]
 
-// Mapping KQ codes to readable labels
-kq_map = [{
-  'KQ_Support_Wellbeing': 'How well do we support people’s wellbeing?',
-  'KQ_Staff_Team': 'How good is our staff team?',
-  'KQ_Setting': 'How good is our setting?',
-  'KQ_Leadership': 'How good is our leadership?',
-  'KQ_Care_Play_and_Learning': 'How good is our care, play and learning?',
-  'KQ_Care_and_Support_Planning': 'How well is our care and support planned?'}]
-  
 // --- 1. Selected Service Plot Data ---
 selected_wrangled = aq.from([service_selected]) // Wrap in array because service_selected is one row
-  .params({ kq_map })
   .fold(Object.keys(service_selected).filter(d => d.startsWith("KQ")), { as: ["kq", "grade"] })
   .groupby("kq", "grade")
   .rollup({ count: op.count() })
   .ungroup("grade")
+  // Mapping KQ codes to readable labels
   .derive({
-    kq_label: (d, $) => op.recode(d.kq, $.kq_map , '?')
+    kq_label: (d) => op.recode(d.kq, { 'KQ_Support_Wellbeing': 'How well do we support people’s wellbeing?','KQ_Staff_Team': 'How good is our staff team?', 'KQ_Setting': 'How good is our setting?', 'KQ_Leadership': 'How good is our leadership?', 'KQ_Care_Play_and_Learning': 'How good is our care, play and learning?', 'KQ_Care_and_Support_Planning': 'How well is our care and support planned?'}, '?')
   })
   
   
@@ -712,5 +703,6 @@ selected_wrangled = aq.from([service_selected]) // Wrap in array because service
 
 
 `{ojs} selected_wrangled.view()`
+
 
 
