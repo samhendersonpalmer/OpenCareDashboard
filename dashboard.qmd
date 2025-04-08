@@ -357,7 +357,7 @@ perc_services_higher_grade = selected_service_compare
   .filter((d, $) => d.MinGrade_numeric > $.selected_MinGrade_numeric)
   .derive({total: d => op.sum(d.percent)})
   // pull out total value
-  .object(1).total
+  .object(1)?.total ?? 0
    
 // TEXT STRING SUBTITLE
 selected_serv_grade_subtitle  = {
