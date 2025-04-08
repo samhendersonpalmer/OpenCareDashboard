@@ -743,13 +743,44 @@ comparison_wrangled = selected_service_compare
     (d.kq === "KQ_Leadership" && d.grade ===  $.selected_KQ_Leadership) ||
     (d.kq === "KQ_Care_Play_and_Learning" && d.grade ===  $.selected_KQ_Care_Play_and_Learning)
   )
-
-
   
 ```
 
+```{ojs}
+// --- 3. Plot ---
+Plot.plot({
+  marks: [
+    // Big colored dots
+    Plot.dot(selected_wrangled.objects(), {
+      x: "kq_label",
+      y: () => 0.1,
+      fill: "grade",
+      r: 20
+    }),
+    // Grade label inside dot
+    Plot.text(selected_wrangled.objects(), {
+      x: "kq_label",
+      y: () => 0.1,
+      text: "grade",
+      fill: "white",
+      fontWeight: "bold",
+      fontSize: 12
+    }),
+    // Comparison text
+    Plot.text(comparison_wrangled.objects(), {
+      x: "kq_label",
+      y: () => 0.5,
+      text: "comparison_text",
+      fontSize: 12,
+      dy: -5
+    })]
+})
+
+```
 
 `{ojs} comparison_wrangled.view()`
+
+
 
 
 
