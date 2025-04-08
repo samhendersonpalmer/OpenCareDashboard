@@ -752,15 +752,15 @@ Plot.plot({
   marks: [
     // Big colored dots
     Plot.dot(selected_wrangled.objects(), {
-      x: "kq_label",
-      y: () => 0.1,
+      y: "kq_label",
+      x: () => 0.1,
       fill: "grade",
       r: 20
     }),
     // Grade label inside dot
     Plot.text(selected_wrangled.objects(), {
-      x: "kq_label",
-      y: () => 0.1,
+      y: "kq_label",
+      x: () => 0.1,
       text: "grade",
       fill: "white",
       fontWeight: "bold",
@@ -768,12 +768,28 @@ Plot.plot({
     }),
     // Comparison text
     Plot.text(comparison_wrangled.objects(), {
-      x: "kq_label",
-      y: () => 0.5,
+      y: "kq_label",
+      x: () => 0.5,
       text: "comparison_text",
       fontSize: 12,
       dy: -5
-    })]
+    })],
+  x: {
+    domain: [0, 1],
+    label: null,
+    tickFormat: "%"
+  },
+  color: {
+    domain: grades,
+    range: ["#d73027", "#fc8d59", "#fdcc3f", "#c3e648", "#91cf60", "#1a9850", "grey"],
+    legend: false
+  },
+  style: {
+    fontFamily: "Open Sans"
+  },
+  width: 800,
+  height: 500,
+  marginLeft: 180
 })
 
 ```
