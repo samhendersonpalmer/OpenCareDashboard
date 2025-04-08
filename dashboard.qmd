@@ -518,7 +518,7 @@ complaints_check = {
   }
 }
 
-// SELECTED SERVICE LAST INSPECTION
+// SELECTED SERVICE COMPLAINTS
 complaints  = {
   if (service_selected.CareService) {
     return complaints_check ; 
@@ -581,9 +581,38 @@ complaints_subtitle  = {
 
 
 ::: {.valuebox icon="clipboard2-check-fill" color="white"}
+
 Requirements
 
-`{ojs} service_selected.any_requirements_2425`
+```{ojs}
+//| echo: false
+//| output: false
+
+// First check there were requirements in year 2425
+requirements_check = {
+  if(service_selected.any_requirements_2425 === "Yes") {
+    return ("This service had requirement(s) from inspections between 1 April 2024 and 31 March 2025");
+  } else {
+    return "No upheld complaints between 1 April 2024 and 31 March 2025";
+  }
+}
+
+// SELECTED SERVICE REQUIREMENTS
+requirements  = {
+  if (service_selected.CareService) {
+    return requirements_check ; 
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+<div class="value-box-value">
+
+`{ojs} requirements`
+
+</div>
+
 
 x% of services of this type that had been inspected had at least one requirement
 
