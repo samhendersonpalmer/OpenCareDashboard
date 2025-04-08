@@ -95,7 +95,7 @@ datastore <-
       Registered_Places == 0 |
         NumberStaff == 0,
       NA,
-      round(NumberStaff / Registered_Places, 1)
+      NumberStaff / Registered_Places
     )
   ) |> 
   # Just 5 services of varying grades to make loading times quicker for now
@@ -442,7 +442,7 @@ Staff
 // First check they have staff
 staff_check = {
   if(service_selected.staff_per_place >=0) {
-    return (service_selected.staff_per_place + " staff per registered place");
+    return (service_selected.staff_per_place.toFixed(2) + " staff per registered place");
   } else {
     return "No staff recorded";
   }
@@ -480,7 +480,7 @@ median_staff = selected_service_compare
 // TEXT STRING SUBTITLE
 median_staff_subtitle  = {
   if (service_selected.CareService) {
-    return "The average (median) number of staff per registered place for services of this type is " + median_staff;
+    return "The average (median) number of staff per registered place for services of this type is " + median_staff.toFixed(2);
   } else{
     return "";
   }
@@ -558,7 +558,7 @@ complaints_undefined_check = {
 // TEXT STRING SUBTITLE
 complaints_subtitle  = {
   if (service_selected.CareService) {
-    return complaints_undefined_check;
+    return perc_services_complaint + "% of services of this type had at least one upheld complaint between 1 April 2024 and 31 March 2025";
   } else{
     return "";
   }
@@ -566,8 +566,6 @@ complaints_subtitle  = {
 ```
 
 `{ojs} complaints_subtitle`
-
-`{ojs} complaints_undefined_check`
 
 :::
 
