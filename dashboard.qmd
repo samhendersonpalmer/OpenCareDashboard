@@ -721,6 +721,9 @@ comparison_wrangled = selected_service_compare
   .derive({
     oneminus_cumsum: d => 1 - d.cumsum
 })
+  .derive({
+     comparison_text: d => "Same as " + (op.round(d.proportion*100)) + "% of services of the same type, whilst " + (op.round(d.oneminus_cumsum*100)) + "% have a higher grade"
+  })
 
   
 ```
