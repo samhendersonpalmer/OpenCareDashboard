@@ -168,16 +168,6 @@ function return_name() {
   }
 }
 
-// Try to create a general purpose handler for nulls as waiting for input
-function null_handler(item) {
-  var name = "Select a service";
-  if (item === null || item === undefined) {
-    return name; // Return default value if item is null or undefined
-  } else {
-    return item; // Return item if it's not null
-  }
-}
-
 service_selected_name = return_name()
 
 // Create function to output row of selected service
@@ -234,10 +224,21 @@ Type
 //| echo: false
 //| output: false
 
+
+// Check if subtype blank
+service_name_check = {
+ if(service_selected.Subtype === "") {
+   return service_selected.CareService;
+    } else {
+    return (service_selected.CareService + " - " + service_selected.Subtype);
+  }
+}
+
+
 // SELECTED SERVICE TYPE
 selected_serv_type  = {
   if (service_selected.CareService) {
-    return (service_selected.CareService + " - " + service_selected.Subtype);
+    return service_name_check;
   } else {
     return "Select a service";
   }
@@ -592,8 +593,10 @@ Requirements
 requirements_check = {
   if(service_selected.any_requirements_2425 === "Yes") {
     return ("This service had requirement(s) from inspections between 1 April 2024 and 31 March 2025");
+  } else  if(service_selected.any_requirements_2425 === "Inspected but no requirements") {
+    return "This service had no requirement(s) from inspections between 1 April 2024 and 31 March 2025";
   } else {
-    return "No upheld complaints between 1 April 2024 and 31 March 2025";
+  return "This service was not inspected between 1 April 2024 and 31 March 2025"
   }
 }
 
@@ -613,8 +616,50 @@ requirements  = {
 
 </div>
 
+```{ojs}
+//| echo: false
+//| output: false
 
-x% of services of this type that had been inspected had at least one requirement
+// PERCENTAGE OF SERVICES WITH ATLEAST 1 REQUIREMENT (OF THOSE THAT HAD BEEN INSPECTED)
+perc_services_requirement = selected_service_compare
+  // First filter out those that have not been inspected (i.e. blank field)
+  .filter((d) => d.any_requirements_2425 !== "")
+  // group by each grade
+  .groupby("any_requirements_2425")
+  // calculate counts of services with all the varying categories of requirements (yes, inspected but none, and blank)
+  .rollup({
+      count: op.count()
+  })
+  // create new column for proportion of services with each number of requirements
+  .derive({ percent: d => op.round((d.count / op.sum(d.count) || 0)*100) }) // include `|| 0` in case sum is zero
+  // Ungroup by number of requirements
+  .ungroup()
+  // filter only those that are "Yes"
+  .filter((d) => d.any_requirements_2425 === "Yes")
+  .derive({total: d => op.sum(d.percent)})
+  // pull out total value
+  .objects()[0]?.total ?? 0
+
+// First check for those that are undefined as all services have had no complaints
+requirements_undefined_check = {
+  if(perc_services_requirement !== 0){
+    return perc_services_requirement + "% of services of this type that had been inspected between 1 April 2024 and 31 March 2025 had at least one requirement";
+  } else {
+    return "No services of this type that had been inspected between 1 April 2024 and 31 March 2025 had any requirements";
+  }
+}
+  
+// TEXT STRING SUBTITLE
+requirements_subtitle  = {
+  if (service_selected.CareService) {
+    return requirements_undefined_check;
+  } else{
+    return "";
+  }
+}
+```
+
+`{ojs} requirements_subtitle`
 
 :::
 
