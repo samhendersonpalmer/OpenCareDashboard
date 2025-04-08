@@ -309,7 +309,7 @@ selected_serv_grade  = {
 //| output: false
 
 // PERCENTAGE OF SERVICES WITH SAME GRADE
-number_services_same_grade = selected_service_compare
+perc_services_same_grade = selected_service_compare
 .params({
   // define parameters
     selected_MinGrade: service_selected.MinGrade
@@ -331,7 +331,7 @@ number_services_same_grade = selected_service_compare
   
    
 // PERCENTAGE OF SERVICES WITH HIGHER GRADE
-number_services_higher_grade = selected_service_compare
+perc_services_higher_grade = selected_service_compare
 .params({
   // define parameters
      selected_MinGrade_numeric: service_selected.MinGrade_numeric
@@ -357,7 +357,7 @@ number_services_higher_grade = selected_service_compare
 // TEXT STRING SUBTITLE
 selected_serv_grade_subtitle  = {
   if (service_selected.CareService) {
-    return ( "Same as " + number_services_same_grade + "% of services of the same type, whilst " + number_services_higher_grade + "% have a higher minimum grade" );
+    return ( "Same as " + perc_services_same_grade + "% of services of the same type, whilst " + perc_services_higher_grade + "% have a higher minimum grade" );
   } else {
     return "";
   }
@@ -489,15 +489,85 @@ median_staff_subtitle  = {
 
 `{ojs} median_staff_subtitle`
 
-
 :::
 
 ::: {.valuebox icon="chat-right-dots-fill" color="white"}
 Complaints
 
-`{ojs} service_selected.Complaints_upheld_2425`
+```{ojs}
+//| echo: false
+//| output: false
 
-x% of services of this type had at least one upheld complaint
+// First check there were complaints in year 2425
+complaints_check = {
+  if(service_selected.Complaints_upheld_2425 >=0) {
+    return (service_selected.Complaints_upheld_2425 + " upheld complaint(s) between 1 April 2024 and 31 March 2025");
+  } else {
+    return "No upheld complaints between 1 April 2024 and 31 March 2025";
+  }
+}
+
+// SELECTED SERVICE LAST INSPECTION
+complaints  = {
+  if (service_selected.CareService) {
+    return complaints_check ; 
+  } else {
+    return "Select a service";
+  }
+}
+```
+
+<div class="value-box-value">
+
+`{ojs} complaints`
+
+</div>
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// PERCENTAGE OF SERVICES WITH ATLEAST 1 UPHELD COMPLAINT
+perc_services_complaint = selected_service_compare
+  // group by each grade
+  .groupby("Complaints_upheld_2425")
+  // calculate counts of services with all the varying numbers of upheld complaints
+  .rollup({
+      count: op.count()
+  })
+  // create new column for proportion of services with each number of complaints
+  .derive({ percent: d => op.round((d.count / op.sum(d.count) || 0)*100) }) // include `|| 0` in case sum is zero
+  // Ungroup by number of complaints
+  .ungroup()
+  // filter out anything less than 1
+  .filter((d) => d.Complaints_upheld_2425 >= 1)
+  .derive({total: d => op.sum(d.percent)})
+  // pull out total value
+  .objects()[0].total
+
+// First check for those that are undefined as all services have had no complaints
+complaints_undefined_check = {
+  if(perc_services_complaint) {
+    return perc_services_complaint + "% of services of this type had at least one upheld complaint between 1 April 2024 and 31 March 2025";
+  } else {
+    return "No services of this type had at least one upheld complaint between 1 April 2024 and 31 March 2025";
+  }
+}
+  
+  
+// TEXT STRING SUBTITLE
+complaints_subtitle  = {
+  if (service_selected.CareService) {
+    return complaints_undefined_check;
+  } else{
+    return "";
+  }
+}
+```
+
+`{ojs} complaints_subtitle`
+
+`{ojs} complaints_undefined_check`
 
 :::
 
