@@ -697,12 +697,23 @@ selected_wrangled = aq.from([service_selected]) // Wrap in array because service
     kq_label: (d) => op.recode(d.kq, { 'KQ_Support_Wellbeing': 'How well do we support people’s wellbeing?','KQ_Staff_Team': 'How good is our staff team?', 'KQ_Setting': 'How good is our setting?', 'KQ_Leadership': 'How good is our leadership?', 'KQ_Care_Play_and_Learning': 'How good is our care, play and learning?', 'KQ_Care_and_Support_Planning': 'How well is our care and support planned?'}, '?')
   })
   
-  
+// --- 2. Comparison Group Data ---
+comparison_wrangled = selected_service_compare
+  .fold(Object.keys(service_selected).filter(d => d.startsWith("KQ")), { as: ["kq", "grade"] })
+  .groupby("kq", "grade")
+  .rollup({ count: op.count() })
+  .filter((d) => d.grade !== "No grade yet")
+  .ungroup("grade")
+  // Mapping KQ codes to readable labels
+  .derive({
+    kq_label: (d) => op.recode(d.kq, { 'KQ_Support_Wellbeing': 'How well do we support people’s wellbeing?','KQ_Staff_Team': 'How good is our staff team?', 'KQ_Setting': 'How good is our setting?', 'KQ_Leadership': 'How good is our leadership?', 'KQ_Care_Play_and_Learning': 'How good is our care, play and learning?', 'KQ_Care_and_Support_Planning': 'How well is our care and support planned?'}, '?')
+  })
+
   
 ```
 
 
-`{ojs} selected_wrangled.view()`
+`{ojs} comparison_wrangled.view()`
 
 
 
