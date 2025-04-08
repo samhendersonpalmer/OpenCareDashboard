@@ -683,6 +683,7 @@ requirements_subtitle  = {
 
 ```{ojs}
 //| echo: false
+//| output: false
 
 // Grade levels (in order)
 grades = ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent", "No grade yet"]
@@ -749,13 +750,15 @@ comparison_wrangled = selected_service_compare
 ```{ojs}
 // --- 3. Plot ---
 Plot.plot({
+  x: { axis: null, tickSize: 0, label: null }, // removes x-axis
+  y: { tickSize: 0, label: null},
   marks: [
     // Big colored dots
     Plot.dot(selected_wrangled.objects(), {
       y: "kq_label",
       x: () => 0.1,
       fill: "grade",
-      r: 20
+      r: 50
     }),
     // Grade label inside dot
     Plot.text(selected_wrangled.objects(), {
@@ -769,15 +772,16 @@ Plot.plot({
     // Comparison text
     Plot.text(comparison_wrangled.objects(), {
       y: "kq_label",
-      x: () => 0.5,
+      x: () => 0.6,
       text: "comparison_text",
       fontSize: 12,
       dy: -5
     })],
   x: {
     domain: [0, 1],
+    axis: null,
     label: null,
-    tickFormat: "%"
+    tickFormat: ""
   },
   color: {
     domain: grades,
@@ -785,16 +789,15 @@ Plot.plot({
     legend: false
   },
   style: {
+    fontSize: "12px",   
     fontFamily: "Open Sans"
   },
-  width: 800,
-  height: 500,
-  marginLeft: 180
+  width: 1000,
+  height: 800,
+  marginLeft: 300
 })
 
 ```
-
-`{ojs} comparison_wrangled.view()`
 
 
 
