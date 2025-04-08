@@ -703,11 +703,24 @@ comparison_wrangled = selected_service_compare
   .groupby("kq", "grade")
   .rollup({ count: op.count() })
   .filter((d) => d.grade !== "No grade yet")
-  .ungroup("grade")
+  .ungroup()
   // Mapping KQ codes to readable labels
   .derive({
     kq_label: (d) => op.recode(d.kq, { 'KQ_Support_Wellbeing': 'How well do we support people’s wellbeing?','KQ_Staff_Team': 'How good is our staff team?', 'KQ_Setting': 'How good is our setting?', 'KQ_Leadership': 'How good is our leadership?', 'KQ_Care_Play_and_Learning': 'How good is our care, play and learning?', 'KQ_Care_and_Support_Planning': 'How well is our care and support planned?'}, '?')
   })
+  .groupby("kq")
+  .derive({
+    proportion: d => d.count / op.sum(d.count)
+  })
+  .orderby("kq_label")
+  .derive({
+  // Calculate cumsum
+    cumsum: aq.rolling(d => op.sum(d.proportion))
+  })
+    // calculate proportion of services GREATER THAN so it's 1 minus the cumsum
+  .derive({
+    oneminus_cumsum: d => 1 - d.cumsum
+})
 
   
 ```
