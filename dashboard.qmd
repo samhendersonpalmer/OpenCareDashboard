@@ -216,7 +216,9 @@ selected_service_compare = mytable
 ### Row 
 
 ::: {.valuebox icon="card-list" color="white"}
-Type
+<div class="value-box-title">
+Service type
+</div>
 
 <div class="value-box-value">
 
@@ -283,7 +285,9 @@ selected_serv_type_subtitle  = {
 :::
 
 ::: {.valuebox icon="emoji-neutral-fill" color="white"}
-Grade
+<div class="value-box-title">
+Lowest grade
+</div>
 
 <div class="value-box-value">
 
@@ -370,7 +374,9 @@ selected_serv_grade_subtitle  = {
 :::
 
 ::: {.valuebox icon="calendar-event-fill" color="white"}
-Inspected
+<div class="value-box-title">
+Last inspected
+</div>
 
 ```{ojs}
 //| echo: false
@@ -435,7 +441,9 @@ selected_serv_last_inspection_subtitle  = {
 
 ::: {.valuebox icon="people-fill" color="white"}
 
-Staff
+<div class="value-box-title">
+Number of staff
+</div>
 
 ```{ojs}
 //| echo: false
@@ -504,7 +512,10 @@ median_staff_subtitle  = {
 :::
 
 ::: {.valuebox icon="chat-right-dots-fill" color="white"}
-Complaints
+
+<div class="value-box-title">
+Upheld complaints
+</div>
 
 ```{ojs}
 //| echo: false
@@ -583,7 +594,9 @@ complaints_subtitle  = {
 
 ::: {.valuebox icon="clipboard2-check-fill" color="white"}
 
-Requirements
+<div class="value-box-title">
+Requirements from inspection
+</div>
 
 ```{ojs}
 //| echo: false
