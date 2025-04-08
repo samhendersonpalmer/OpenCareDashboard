@@ -682,6 +682,7 @@ requirements_subtitle  = {
 
 
 ```{ojs}
+//| echo: false
 
 // Grade levels (in order)
 grades = ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent", "No grade yet"]
@@ -699,6 +700,16 @@ selected_wrangled = aq.from([service_selected]) // Wrap in array because service
   
 // --- 2. Comparison Group Data ---
 comparison_wrangled = selected_service_compare
+.params({
+  // define parameters
+    selected_KQ_Care_and_Support_Planning: service_selected.KQ_Care_and_Support_Planning,
+    selected_KQ_Support_Wellbeing: service_selected.KQ_Support_Wellbeing,
+    selected_KQ_Staff_Team: service_selected.KQ_Staff_Team,
+    selected_KQ_Setting: service_selected.KQ_Setting,
+    selected_KQ_Leadership: service_selected.KQ_Leadership,
+    selected_KQ_Care_Play_and_Learning: service_selected.KQ_Care_Play_and_Learning
+    
+  })
   .fold(Object.keys(service_selected).filter(d => d.startsWith("KQ")), { as: ["kq", "grade"] })
   .groupby("kq", "grade")
   .rollup({ count: op.count() })
@@ -724,6 +735,15 @@ comparison_wrangled = selected_service_compare
   .derive({
      comparison_text: d => "Same as " + (op.round(d.proportion*100)) + "% of services of the same type, whilst " + (op.round(d.oneminus_cumsum*100)) + "% have a higher grade"
   })
+ .filter((d, $) =>
+    (d.kq === "KQ_Care_and_Support_Planning" && d.grade ===  $.selected_KQ_Care_and_Support_Planning) ||
+    (d.kq === "KQ_Support_Wellbeing" && d.grade ===  $.selected_KQ_Support_Wellbeing) ||
+    (d.kq === "KQ_Staff_Team" && d.grade ===  $.selected_KQ_Staff_Team) ||
+    (d.kq === "KQ_Setting" && d.grade ===  $.selected_KQ_Setting) ||
+    (d.kq === "KQ_Leadership" && d.grade ===  $.selected_KQ_Leadership) ||
+    (d.kq === "KQ_Care_Play_and_Learning" && d.grade ===  $.selected_KQ_Care_Play_and_Learning)
+  )
+
 
   
 ```
