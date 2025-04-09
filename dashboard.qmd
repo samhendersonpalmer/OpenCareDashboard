@@ -7,7 +7,7 @@ format:
 
 ## Column {width="20%"}
 
-### Row {height="55%"}
+### Row {height="50%"}
 
 ```{r, install_packages}
 #| echo: false
@@ -96,10 +96,7 @@ datastore <-
       NA,
       NumberStaff / Registered_Places
     )
-  ) |> 
-  # Just 5 services of varying grades to make loading times quicker for now
-  group_by(MinGrade_numeric, CareService, Subtype) |> 
-  slice(1:2)
+  )
 
 # Specify order of grades in minimum grade as factor
 datastore$MinGrade <- factor(
@@ -183,7 +180,7 @@ function filtered_df() {
 service_selected = filtered_df()
 ```
 
-### Row {height="33%"}
+### Row {height="38%"}
 
 ::: {.callout-note appearance="minimal"}
 ## Disclaimer
@@ -684,7 +681,7 @@ requirements_subtitle  = {
 :::
 
 
-# Grades
+# Grade comparison
 
 ```{ojs}
 //| echo: false
