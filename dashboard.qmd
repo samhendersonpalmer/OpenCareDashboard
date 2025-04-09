@@ -196,7 +196,7 @@ This dashboard is not affiliated with or supported by the Care Inspectorate. It 
 
 <SPAN STYLE="font-size:9.0pt">
 Last refreshed: `r format(Sys.time(), "%d %b %Y %X")` <br>
-Data up to: `r format(as.Date(substr(list.files("Data")[[1]], 0, 10)), "%d %b %Y")`
+Data as at: `r format(as.Date(substr(list.files("Data")[[1]], 0, 10)), "%d %b %Y")`
 </SPAN> 
 
 # Overview
@@ -809,8 +809,6 @@ Plot.plot({
 })
 
 ```
-
-
 
 
 
