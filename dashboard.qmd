@@ -5,10 +5,9 @@ format:
     orientation: columns
 ---
 
-
 ## Column {width="20%"}
 
-### Row {height="50%"}
+### Row {height="55%"}
 
 ```{r, install_packages}
 #| echo: false
@@ -184,7 +183,7 @@ function filtered_df() {
 service_selected = filtered_df()
 ```
 
-### Row {height="50%"}
+### Row {height="33%"}
 
 ::: {.callout-note appearance="minimal"}
 ## Disclaimer
@@ -192,6 +191,13 @@ This dashboard is not affiliated with or supported by the Care Inspectorate. It 
 
 [Data source](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore)
 :::
+
+### Row {height="12%"}
+
+<SPAN STYLE="font-size:9.0pt">
+Last refreshed: `r format(Sys.time(), "%d %b %Y %X")` <br>
+Data up to: `r format(as.Date(substr(list.files("Data")[[1]], 0, 10)), "%d %b %Y")`
+</SPAN> 
 
 # Overview
 
@@ -285,7 +291,7 @@ selected_serv_type_subtitle  = {
 
 :::
 
-::: {.valuebox icon="emoji-neutral-fill" color="white"}
+::: {.valuebox icon="house-heart-fill" color="white"}
 <div class="value-box-title">
 Lowest grade
 </div>
@@ -679,7 +685,6 @@ requirements_subtitle  = {
 
 
 # Grades
-
 
 ```{ojs}
 //| echo: false
