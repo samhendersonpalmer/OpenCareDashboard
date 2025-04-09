@@ -1,11 +1,23 @@
 ---
-title: "OpenCareDashboard"
+title: "OpenCare"
+subtitle: compare social care across Scotland <a href='https://samhendersonpalmer.github.io/OpenCareDashboard/'><img src='images/oc_logo.png' align="right" height="100" /></a>
 ---
+OpenCare allows anyone to search for a care service and see how it’s quality compares
+with its peers across Scotland using public data from the [Care
+Inspectorate](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore). Just navigate to the Dashboard on the drop down menu in the sidebar of this page to begin.
 
-This is a Quarto website.
+## Preview
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+<p align="center">
+<img src="images/dashboard_screenshot.PNG" width = "90%" >
+</p>
 
-```{r}
-1 + 1
-```
+## Notes
+This dashboard was created using Quarto, Observable JavaScript, caffeine and R, inspired by a series by [Melissa Van Bussel](https://www.youtube.com/@ggnot2).
+
+::: {.callout-note appearance="minimal"}
+## Disclaimer
+This dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0. 
+
+[Data source](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore)
+:::
