@@ -5,7 +5,6 @@ format:
     orientation: columns
 ---
 
-
 ## Column {width="20%"}
 
 ### Row {height="50%"}
@@ -97,10 +96,7 @@ datastore <-
       NA,
       NumberStaff / Registered_Places
     )
-  ) |> 
-  # Just 5 services of varying grades to make loading times quicker for now
-  group_by(MinGrade_numeric, CareService, Subtype) |> 
-  slice(1:2)
+  )
 
 # Specify order of grades in minimum grade as factor
 datastore$MinGrade <- factor(
@@ -128,8 +124,9 @@ ojs_define(datastore = datastore)
 //| echo: false
 //| output: false
 
-// Load tidyverse-equivalent OJS library for later reshaping
+// Load tidyverse-equivalent OJS library for later reshaping and visualising
 import { aq, op } from '@uwdata/arquero'
+import { Plot } from "@observablehq/plot"
 
 // Transpose data to make it useable in ojs inputs
 datastore_transposed = transpose(datastore)
@@ -183,7 +180,7 @@ function filtered_df() {
 service_selected = filtered_df()
 ```
 
-### Row {height="50%"}
+### Row {height="38%"}
 
 ::: {.callout-note appearance="minimal"}
 ## Disclaimer
@@ -191,6 +188,13 @@ This dashboard is not affiliated with or supported by the Care Inspectorate. It 
 
 [Data source](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore)
 :::
+
+### Row {height="12%"}
+
+<SPAN STYLE="font-size:9.0pt">
+Last refreshed: `r format(Sys.time(), "%d %b %Y %X")` <br>
+Data as at: `r format(as.Date(substr(list.files("Data")[[1]], 0, 10)), "%d %b %Y")`
+</SPAN> 
 
 # Overview
 
@@ -284,7 +288,7 @@ selected_serv_type_subtitle  = {
 
 :::
 
-::: {.valuebox icon="emoji-neutral-fill" color="white"}
+::: {.valuebox icon="house-heart-fill" color="white"}
 <div class="value-box-title">
 Lowest grade
 </div>
@@ -677,8 +681,131 @@ requirements_subtitle  = {
 :::
 
 
-# Grades
+# Grade comparison
 
-`{ojs} number_services_same_type`
+```{ojs}
+//| echo: false
+//| output: false
+
+// Grade levels (in order)
+grades = ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent", "No grade yet"]
+
+// --- 1. Selected Service Plot Data ---
+selected_wrangled = aq.from([service_selected]) // Wrap in array because service_selected is one row
+  .fold(Object.keys(service_selected).filter(d => d.startsWith("KQ")), { as: ["kq", "grade"] })
+  .groupby("kq", "grade")
+  .rollup({ count: op.count() })
+  .ungroup("grade")
+  // Mapping KQ codes to readable labels
+  .derive({
+    kq_label: (d) => op.recode(d.kq, { 'KQ_Support_Wellbeing': 'How well do we support people’s wellbeing?','KQ_Staff_Team': 'How good is our staff team?', 'KQ_Setting': 'How good is our setting?', 'KQ_Leadership': 'How good is our leadership?', 'KQ_Care_Play_and_Learning': 'How good is our care, play and learning?', 'KQ_Care_and_Support_Planning': 'How well is our care and support planned?'}, '?')
+  })
+  
+// --- 2. Comparison Group Data ---
+comparison_wrangled = selected_service_compare
+.params({
+  // define parameters
+    selected_KQ_Care_and_Support_Planning: service_selected.KQ_Care_and_Support_Planning,
+    selected_KQ_Support_Wellbeing: service_selected.KQ_Support_Wellbeing,
+    selected_KQ_Staff_Team: service_selected.KQ_Staff_Team,
+    selected_KQ_Setting: service_selected.KQ_Setting,
+    selected_KQ_Leadership: service_selected.KQ_Leadership,
+    selected_KQ_Care_Play_and_Learning: service_selected.KQ_Care_Play_and_Learning
+    
+  })
+  .fold(Object.keys(service_selected).filter(d => d.startsWith("KQ")), { as: ["kq", "grade"] })
+  .groupby("kq", "grade")
+  .rollup({ count: op.count() })
+  .filter((d) => d.grade !== "No grade yet")
+  .ungroup()
+  // Mapping KQ codes to readable labels
+  .derive({
+    kq_label: (d) => op.recode(d.kq, { 'KQ_Support_Wellbeing': 'How well do we support people’s wellbeing?','KQ_Staff_Team': 'How good is our staff team?', 'KQ_Setting': 'How good is our setting?', 'KQ_Leadership': 'How good is our leadership?', 'KQ_Care_Play_and_Learning': 'How good is our care, play and learning?', 'KQ_Care_and_Support_Planning': 'How well is our care and support planned?'}, '?')
+  })
+  // Create numbered equivalent of grades for orderby later
+  .derive({
+  grade_value: (d) => op.recode(d.grade, { 'Unsatisfactory': 1,'Weak': 2, 'Adequate': 3, 'Good': 4, 'Very good': 5, 'Excellent': 6}, '?')
+})
+  .groupby("kq")
+  .derive({
+    proportion: d => d.count / op.sum(d.count)
+  })
+  .orderby("kq_label", "grade_value")
+  .derive({
+  // Calculate cumsum
+    cumsum: aq.rolling(d => op.sum(d.proportion))
+  })
+    // calculate proportion of services GREATER THAN so it's 1 minus the cumsum
+  .derive({
+    oneminus_cumsum: d => 1 - d.cumsum
+})
+  .derive({
+     comparison_text: d => "Same as " + (op.round(d.proportion*100)) + "% of services of the same type, whilst " + (op.round(d.oneminus_cumsum*100)) + "% have a higher grade"
+  })
+  .filter((d, $) =>
+    (d.kq === "KQ_Care_and_Support_Planning" && d.grade ===  $.selected_KQ_Care_and_Support_Planning) ||
+    (d.kq === "KQ_Support_Wellbeing" && d.grade ===  $.selected_KQ_Support_Wellbeing) ||
+    (d.kq === "KQ_Staff_Team" && d.grade ===  $.selected_KQ_Staff_Team) ||
+    (d.kq === "KQ_Setting" && d.grade ===  $.selected_KQ_Setting) ||
+    (d.kq === "KQ_Leadership" && d.grade ===  $.selected_KQ_Leadership) ||
+    (d.kq === "KQ_Care_Play_and_Learning" && d.grade ===  $.selected_KQ_Care_Play_and_Learning)
+  )
+  
+```
+
+```{ojs}
+// --- 3. Plot ---
+Plot.plot({
+  x: { axis: null, tickSize: 0, label: null }, // removes x-axis
+  y: { tickSize: 0, label: null},
+  marks: [
+    // Big colored dots
+    Plot.dot(selected_wrangled.objects(), {
+      y: "kq_label",
+      x: () => 0.05,
+      fill: "grade",
+      r: 45
+    }),
+    // Grade label inside dot
+    Plot.text(selected_wrangled.objects(), {
+      y: "kq_label",
+      x: () => 0.05,
+      text: "grade",
+      fill: "white",
+      fontWeight: "bold",
+      fontSize: 12
+    }),
+    // Comparison text
+    Plot.text(comparison_wrangled.objects(), {
+      y: "kq_label",
+      x: () => 0.35,
+      text: "comparison_text",
+      fontSize: 16,
+      dy: -5
+    })],
+  x: {
+    domain: [0, 1],
+    axis: null,
+    label: null,
+    tickFormat: ""
+  },
+  color: {
+    domain: grades,
+    range: ["#d73027", "#fc8d59", "#fdcc3f", "#c3e648", "#91cf60", "#1a9850", "grey"],
+    legend: false
+  },
+  style: {
+    fontSize: "20px",  
+    fontWeight: "bold",
+    labelAnchor: "left"
+    //fontFamily: "Open Sans"
+  },
+  width: Math.max(width, 800),
+  height: 600,
+  marginLeft: 700
+})
+
+```
+
 
 
