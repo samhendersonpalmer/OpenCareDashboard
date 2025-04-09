@@ -720,11 +720,15 @@ comparison_wrangled = selected_service_compare
   .derive({
     kq_label: (d) => op.recode(d.kq, { 'KQ_Support_Wellbeing': 'How well do we support people’s wellbeing?','KQ_Staff_Team': 'How good is our staff team?', 'KQ_Setting': 'How good is our setting?', 'KQ_Leadership': 'How good is our leadership?', 'KQ_Care_Play_and_Learning': 'How good is our care, play and learning?', 'KQ_Care_and_Support_Planning': 'How well is our care and support planned?'}, '?')
   })
+  // Create numbered equivalent of grades for orderby later
+  .derive({
+  grade_value: (d) => op.recode(d.grade, { 'Unsatisfactory': 1,'Weak': 2, 'Adequate': 3, 'Good': 4, 'Very good': 5, 'Excellent': 6}, '?')
+})
   .groupby("kq")
   .derive({
     proportion: d => d.count / op.sum(d.count)
   })
-  .orderby("kq_label")
+  .orderby("kq_label", "grade_value")
   .derive({
   // Calculate cumsum
     cumsum: aq.rolling(d => op.sum(d.proportion))
@@ -736,7 +740,7 @@ comparison_wrangled = selected_service_compare
   .derive({
      comparison_text: d => "Same as " + (op.round(d.proportion*100)) + "% of services of the same type, whilst " + (op.round(d.oneminus_cumsum*100)) + "% have a higher grade"
   })
- .filter((d, $) =>
+  .filter((d, $) =>
     (d.kq === "KQ_Care_and_Support_Planning" && d.grade ===  $.selected_KQ_Care_and_Support_Planning) ||
     (d.kq === "KQ_Support_Wellbeing" && d.grade ===  $.selected_KQ_Support_Wellbeing) ||
     (d.kq === "KQ_Staff_Team" && d.grade ===  $.selected_KQ_Staff_Team) ||
