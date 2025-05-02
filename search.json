@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "OpenCare",
     "section": "",
-    "text": "OpenCare allows anyone to search for a care service and see how it’s quality compares with its peers across Scotland using public data from the Care Inspectorate. Just navigate to the Dashboard on the drop down menu in the sidebar of this page to begin.",
+    "text": "OpenCare allows anyone to search for a care service and see how its quality compares with its peers across Scotland using public data from the Care Inspectorate. Just navigate to the Dashboard on the drop down menu in the sidebar of this page to begin.",
     "crumbs": [
       "About"
     ]
@@ -24,7 +24,7 @@
     "href": "index.html#notes",
     "title": "OpenCare",
     "section": "Notes",
-    "text": "Notes\nThis dashboard was created using Quarto, Observable JavaScript, caffeine and R, inspired by a series by Melissa Van Bussel.\n\n\n\n\n\n\nDisclaimer\n\n\n\nThis dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0.\nData source",
+    "text": "Notes\nThis dashboard was created using R, Quarto, Observable JavaScript and caffeine, inspired by a series by Melissa Van Bussel.\n\n\n\n\n\n\nDisclaimer\n\n\n\nThis dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0.\nData source",
     "crumbs": [
       "About"
     ]
