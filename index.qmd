@@ -2,7 +2,7 @@
 title: "OpenCare"
 subtitle: compare social care across Scotland <a href='https://samhendersonpalmer.github.io/OpenCareDashboard/'><img src='images/oc_logo.png' align="right" height="100" /></a>
 ---
-OpenCare allows anyone to search for a care service and see how it’s quality compares
+OpenCare allows anyone to search for a care service and see how its quality compares
 with its peers across Scotland using public data from the [Care
 Inspectorate](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore). Just navigate to the Dashboard on the drop down menu in the sidebar of this page to begin.
 
@@ -13,7 +13,7 @@ Inspectorate](https://www.careinspectorate.com/index.php/publications-statistics
 </p>
 
 ## Notes
-This dashboard was created using Quarto, Observable JavaScript, caffeine and R, inspired by a series by [Melissa Van Bussel](https://www.youtube.com/@ggnot2).
+This dashboard was created using R, Quarto, Observable JavaScript and caffeine, inspired by a series by [Melissa Van Bussel](https://www.youtube.com/@ggnot2).
 
 ::: {.callout-note appearance="minimal"}
 ## Disclaimer
