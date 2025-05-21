@@ -1,4 +1,4 @@
-# A function that returns the latest datastore URL. It requires month and year input
+# A function that returns the latest datastore URL
 
 latest_url <- function() {
   # Load packages

@@ -5,7 +5,7 @@ download_latest_datastore <- function() {
   
   latest_url_list <- latest_url()
   
-  latest_datastore <- read.csv(latest_url_list$url, encoding = "latin1")
+  latest_datastore <-  read_csv(latest_url_list$url, locale = readr::locale(encoding = "Windows-1252"))
   
   saveRDS(latest_datastore,
           file = paste0("Data/", latest_url_list$date, "_datastore.rds"))
