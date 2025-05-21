@@ -13,18 +13,38 @@ $callout-color-note: #922592;
 }
 
 // Adjusting dashboard display
+
+// CARDS
 .quarto-card {
           padding: 0;
-          border: none !important;
         }
         
-// tabsets
+.card {
+  // Remove grey border around all cards
+    border: 0 !important;
+}
+
+// Card title background colour
+.card-header {
+  font-weight: bold;
+  color: #922592 !important;
+  background-color: white !important;
+  border: 0 !important;
+}
+
+// remove padding on body
+.card-body {
+  padding-top: 0!important;
+  padding-bottom: 0!important;
+}
+        
+// TABSETS
 .panel-tabset .nav-item {
   font-size: 16px;
   border: none !important;
 }
 
-// value boxes
+// VALUE BOXES
 .valuebox .value-box-value {
   font-size: 20px !important;
   color: #922592;
@@ -41,7 +61,7 @@ $callout-color-note: #922592;
   font-weight: bold;
 }
 
-
+// REMOVE ERROR BOX WHEN NULL VALUE
 .observablehq--error {
   display: none;
 }
