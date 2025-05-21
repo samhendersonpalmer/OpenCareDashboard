@@ -19,7 +19,14 @@ library(tidyverse)
 #| echo: false
 #| include: false
 
-raw_data <- readRDS("Data/2025-02-28_datastore.rds")
+# Find most recent modified file for latest downloaded datastore:
+modified_filenames <- file.info(list.files("Data", full.names = T))
+
+# Locate filename of object most recently modified and assing to object
+latest_datastore <- rownames(modified_filenames)[which.max(modified_filenames$mtime)]
+
+# Read in latest datastore file
+raw_data <- readRDS(latest_datastore)
 
 
 cleaned_data <-
