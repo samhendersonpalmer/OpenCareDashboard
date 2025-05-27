@@ -221,7 +221,11 @@ selected_service_compare = mytable
   })
   // filter to only include services of the same type
   .filter((d, $) => op.includes($.selected_CareService, d.CareService) &&
-  op.includes($.selected_Subtype, d.Subtype))
+    (
+      $.selected_Subtype == null || $.selected_Subtype == "NA" || d.Subtype == null || d.Subtype == "NA"
+        ? true // If either selected or record Subtype is NA/null, include it
+        : op.includes($.selected_Subtype, d.Subtype)
+    ))
 ```
 
 ### Row 
@@ -240,7 +244,8 @@ Service type
 
 // Check if subtype blank
 service_name_check = {
- if(service_selected.Subtype === "") {
+  const subtype = service_selected?.Subtype;
+  if (subtype === undefined || subtype === null || subtype === "NA") {
    return service_selected.CareService;
     } else {
     return (service_selected.CareService + " - " + service_selected.Subtype);
