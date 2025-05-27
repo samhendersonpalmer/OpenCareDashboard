@@ -199,7 +199,7 @@ This dashboard is not affiliated with or supported by the Care Inspectorate. It 
 ### Row {height="12%"}
 
 <SPAN STYLE="font-size:9.0pt">
-Last refreshed: `r format(Sys.time(), "%d %b %Y %X")` <br>
+Last refreshed: `r format(Sys.time(), tz="Europe/London", "%d %b %Y %X")` <br>
 Data as at: `r format(as.Date(substr(latest_datastore, 6, 15)), "%d %b %Y")`
 </SPAN> 
 
