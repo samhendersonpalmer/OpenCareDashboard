@@ -22,7 +22,7 @@ library(tidyverse)
 # Find most recent modified file for latest downloaded datastore:
 modified_filenames <- file.info(list.files("Data", full.names = T))
 
-# Locate filename of object most recently modified and assing to object
+# Locate filename of object most recently modified and adding to object
 latest_datastore <- rownames(modified_filenames)[which.max(modified_filenames$mtime)]
 
 # Read in latest datastore file
