@@ -1,0 +1,42 @@
+# Credit to this guide: https://nrennie.rbind.io/blog/automatically-deploying-a-shiny-app-for-browsing-rstats-tweets-with-github-actions/
+name: Update data
+
+on:
+  workflow_dispatch:
+  schedule:
+    # update everyday at 6am
+    - cron: '0 6 * * *'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4.0'
+
+      - name: Install R Dependencies
+        uses: r-lib/actions/setup-renv@v2
+        with:
+          cache-version: 1
+
+      - name: Update data
+        run: |
+          source("update_data.R")
+        shell: Rscript {0}
+          
+      - name: Commit files
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add --all
+          git commit -m "add data"
+          git push
