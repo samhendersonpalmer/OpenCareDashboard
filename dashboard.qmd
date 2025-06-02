@@ -1135,3 +1135,5 @@ Plot.plot({
 
 ```
 :::
+
+# Grade history
