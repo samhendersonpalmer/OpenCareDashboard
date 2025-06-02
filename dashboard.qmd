@@ -20,7 +20,10 @@ library(tidyverse)
 #| include: false
 
 # Find most recent modified file for latest downloaded datastore:
-modified_filenames <- file.info(list.files("Data", full.names = T))
+modified_filenames <- file.info(list.files("Data", full.names = T)) |>  
+  # Have to now exclude the inspection_series data I've added so just datastores searched for
+  filter(
+    !row.names(file.info(list.files("Data", full.names = T))) %in% "Data/inspection_series.rds")
 
 # Locate filename of object most recently modified and adding to object
 latest_datastore <- rownames(modified_filenames)[which.max(modified_filenames$mtime)]
@@ -1137,3 +1140,4 @@ Plot.plot({
 :::
 
 # Grade history
+`{ojs} service_selected.CSNumber`
