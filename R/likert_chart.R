@@ -22,7 +22,11 @@ sample_inspection <- inspection_series |>
     Grade == 4  ~ "Good", 
     Grade == 5  ~ "Very good", 
     Grade == 6  ~ "Excellent")) |> 
-  na.omit(Grade)
+  na.omit(Grade) |> 
+  group_by(Last_inspection_Date, Grade_descr) |> 
+  mutate(count = n()) %>% 
+  ungroup() |> 
+  distinct(Last_inspection_Date, Grade_descr, .keep_all=TRUE)
 
 # Change grade column to factor for ordering in legend
 sample_inspection$Grade_descr <- factor(sample_inspection$Grade_descr, levels = c("Unsatisfactory", 
@@ -42,9 +46,7 @@ myColors <- c("Unsatisfactory" = "#d73027",
 
 
 # Create Likert chart -----------------------------------------------------
-
-
-ggplot(sample_inspection, aes(x = as.Date(Last_inspection_Date), y = as.numeric(Grade), fill = Grade_descr)) +
+ggplot(sample_inspection, aes(x = as.Date(Last_inspection_Date), y = count, fill = Grade_descr)) +
   geom_bar(position = position_fill(reverse = TRUE), stat = "identity", show.legend=TRUE) +
   scale_y_continuous(labels = scales::percent) +
   # Drop and show.legend above means we keep all grade labels even if not visible
@@ -61,4 +63,4 @@ ggplot(sample_inspection, aes(x = as.Date(Last_inspection_Date), y = as.numeric(
         plot.margin=unit(c(0,0,0,0), 'cm'),
         legend.title=element_blank()) + 
   # Have legend just on one line
-  guides(fill = guide_legend(nrow = 1))
+  guides(fill = guide_legend(nrow = 1)) 
