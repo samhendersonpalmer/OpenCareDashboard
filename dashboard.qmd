@@ -1173,7 +1173,7 @@ inspection_history_table = inspection_history
 
 // --- 1. Selected Service condensed table ---
 selected_likert_table = inspection_history_table
-  .fold(inspection_history_table.columnNames().slice(5, 17), {
+  .fold(inspection_history_table.columnNames().slice(4, 17), {
     as: ['Question', 'Grade']
   })
   .derive({
@@ -1186,21 +1186,10 @@ selected_likert_table = inspection_history_table
   })
   .ungroup()
   .dedupe(['Last_inspection_Date', 'Grade_descr'])
-  .derive({
-  date_test: aq.escape(d => op.parse_date(d.Last_inspection_Date))})
-  .derive({
-  d3date_test: aq.escape(d => parser(d.Last_inspection_Date))})
-  .derive({
-  month_test: (d) => op.utcmonth(d.Last_inspection_Date)})
-
-```
-
-`{ojs} Inputs.table(selected_likert_table)`
-
-
-`{ojs} Inputs.table(calc_selected_likert_table)`
-
-```{ojs}
+  
+  
+  
+// --- 2. Calculate proportions of each grade ---
 calc_selected_likert_table = selected_likert_table
   .groupby('Last_inspection_Date')
   .derive({
@@ -1210,7 +1199,13 @@ calc_selected_likert_table = selected_likert_table
     proportion: d => d.count / d.total
   })
   .objects()
-  
+```
+
+`{ojs} Inputs.table(selected_likert_table)`
+
+`{ojs} Inputs.table(calc_selected_likert_table)`
+
+```{ojs}
 Plot.plot({
   marks: [
     Plot.barY(calc_selected_likert_table, {
@@ -1244,21 +1239,4 @@ Plot.plot({
   marginLeft: 60,
   marginRight: 20
 })
-
-Plot.plot({
-  x: {round: true, tickFormat: "d"},
-  color: {scheme: "BuRd"},
-  marks: [
-    Plot.barX(calc_selected_likert_table, {
-      x: "Last_inspection_Date",
-      fill: "Grade_descr",
-      interval: 1, // annual observations
-      inset: 0 // no gaps
-    })
-  ]
-})
-
-
-
-
 ```
