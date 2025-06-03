@@ -121,6 +121,9 @@ datastore$MinGrade,
     "No grade yet"
   )
 )
+
+# Read in inspection series file
+inspection_series <- readRDS("Data/inspection_series.rds")
 ```
 
 
@@ -128,6 +131,7 @@ datastore$MinGrade,
 #| echo: false
 #| include: false
 ojs_define(datastore = datastore)
+ojs_define(inspection_series = inspection_series)
 ```
 
 ```{ojs}
@@ -137,6 +141,10 @@ ojs_define(datastore = datastore)
 // Load tidyverse-equivalent OJS library for later reshaping and visualising
 import { aq, op } from '@uwdata/arquero'
 import { Plot } from "@observablehq/plot"
+
+// Import time parser
+d3 = require("d3@7")
+parser = d3.timeParse("%Y-%m-%d");
 
 // Transpose data to make it useable in ojs inputs
 datastore_transposed = transpose(datastore)
@@ -1140,4 +1148,117 @@ Plot.plot({
 :::
 
 # Grade history
-`{ojs} service_selected.CSNumber`
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// Use arquero to create dynamic inspection history table
+inspection_history = aq.table(inspection_series)
+
+// Create filtered table for selected service inspection history
+inspection_history_table = inspection_history
+  .params({
+  // define parameters
+    selected_CSNumber: service_selected.CSNumber,
+  })
+  // filter to only include services of the same type
+  .filter((d, $) => d.CSNumber === $.selected_CSNumber)
+```
+
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// --- 1. Selected Service condensed table ---
+selected_likert_table = inspection_history_table
+  .fold(inspection_history_table.columnNames().slice(5, 17), {
+    as: ['Question', 'Grade']
+  })
+  .derive({
+  Grade_descr: (d) => op.recode(d.Grade, { '1':'Unsatisfactory', '2':'Weak', '3':'Adequate', '4': 'Good', '5': 'Very good',  '6': 'Excellent'}, '?')
+  })
+  .filter(d => d.Grade != null)
+  .groupby('Last_inspection_Date', 'Grade_descr')
+  .derive({
+    count: aq.op.count()
+  })
+  .ungroup()
+  .dedupe(['Last_inspection_Date', 'Grade_descr'])
+  .derive({
+  date_test: aq.escape(d => op.parse_date(d.Last_inspection_Date))})
+  .derive({
+  d3date_test: aq.escape(d => parser(d.Last_inspection_Date))})
+  .derive({
+  month_test: (d) => op.utcmonth(d.Last_inspection_Date)})
+
+```
+
+`{ojs} Inputs.table(selected_likert_table)`
+
+
+`{ojs} Inputs.table(calc_selected_likert_table)`
+
+```{ojs}
+calc_selected_likert_table = selected_likert_table
+  .groupby('Last_inspection_Date')
+  .derive({
+    total: aq.op.sum('count')
+  })
+  .derive({
+    proportion: d => d.count / d.total
+  })
+  .objects()
+  
+Plot.plot({
+  marks: [
+    Plot.barY(calc_selected_likert_table, {
+      x: "Last_inspection_Date",
+      y: "proportion",
+      fill: "Grade_descr",
+      order: "Grade_descr",  // keeps stacking consistent
+      reverse: true          // match ggplot reverse stacking
+    }),
+    Plot.axisY({ tickFormat: d => `${Math.round(d)}%` }),
+    Plot.axisX({ tickRotate: 0, label: "Inspections" })
+  ],
+  color: {
+    domain: ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent"],
+    range: ["#d73027", "#fc8d59", "#fdcc3f", "#c3e648", "#91cf60", "#1a9850"],
+    legend: true,
+    legendPosition: "top"
+  },
+  y: {
+    label: "",
+    percent: true
+  },
+  // style applied globally to plot
+  style: {
+    fontSize: "14px", 
+  },
+  width: 800,
+  height: 400,
+  marginTop: 60,
+  marginBottom: 60,
+  marginLeft: 60,
+  marginRight: 20
+})
+
+Plot.plot({
+  x: {round: true, tickFormat: "d"},
+  color: {scheme: "BuRd"},
+  marks: [
+    Plot.barX(calc_selected_likert_table, {
+      x: "Last_inspection_Date",
+      fill: "Grade_descr",
+      interval: 1, // annual observations
+      inset: 0 // no gaps
+    })
+  ]
+})
+
+
+
+
+```
