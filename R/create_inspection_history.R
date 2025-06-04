@@ -88,7 +88,7 @@ combined_datastores_grading <- combined_datastores_variables |>
          (starts_with("Quality_") & !ends_with("_change")),
          URL) |> 
   # We can add multiple date formats to check for
-  mutate(across(c("Publication_of_Latest_Grading", "Last_inspection_Date"), ~parse_date_time(.x, c("dmy")))) |> 
+  mutate(across(c("Publication_of_Latest_Grading", "Last_inspection_Date"), ~parse_date_time(.x, c("dmy"), tz = "GMT"))) |> 
   # convert datetimes to just dates
   mutate(across(c("Publication_of_Latest_Grading", "Last_inspection_Date"), as.Date))
   
