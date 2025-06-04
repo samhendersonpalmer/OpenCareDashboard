@@ -1205,7 +1205,7 @@ calc_selected_likert_table = selected_likert_table
 `{ojs} Inputs.table(calc_selected_likert_table)`
 
 ```{ojs}
-Plot.plot({
+calc_selected_likert_table ? Plot.plot({
   marks: [
     Plot.barY(calc_selected_likert_table, {
       x: "date_parsed",
@@ -1217,11 +1217,14 @@ Plot.plot({
     Plot.axisY({ tickFormat: d => `${Math.round(d)}%` }),
     Plot.axisX({ tickRotate: 0, label: "Inspections" })
   ],
+  x: {
+  type: "band"
+  },
   color: {
     domain: ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent"],
     range: ["#d73027", "#fc8d59", "#fdcc3f", "#c3e648", "#91cf60", "#1a9850"],
     legend: true,
     legendPosition: "top"
   }
-})
+}) : null
 ```
