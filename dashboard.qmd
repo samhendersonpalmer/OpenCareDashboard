@@ -1186,8 +1186,8 @@ selected_likert_table = aq.from(inspection_history_table)
   })
   .ungroup()
   .dedupe(['Last_inspection_Date', 'Grade_descr'])
-  .derive({ date_test: aq.escape(d => parser(d.Last_inspection_Date)) })
-  .derive({ year_test: aq.escape(d => d3.timeMonth(d.date_test)) })
+  .derive({ date_parsed: aq.escape(d => parser(d.Last_inspection_Date)) })
+  .derive({ month: aq.escape(d => d3.timeMonth(d.date_parsed)) })
   
   
   
@@ -1211,7 +1211,7 @@ calc_selected_likert_table = selected_likert_table
 Plot.plot({
   marks: [
     Plot.barY(calc_selected_likert_table, {
-      x: "year_test",
+      x: "month",
       y: "proportion",
       fill: "Grade_descr",
       order: "Grade_descr",  // keeps stacking consistent
