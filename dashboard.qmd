@@ -1225,6 +1225,11 @@ fx: {interval: "month"},
     range: ["#d73027", "#fc8d59", "#fdcc3f", "#c3e648", "#91cf60", "#1a9850"],
     legend: true,
     legendPosition: "top"
-  }
+  },
+  style: {
+  fontSize: "14px"
+},
+  width: 1000,
+  height: 400
 })
 ```
