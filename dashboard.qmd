@@ -1200,10 +1200,6 @@ calc_selected_likert_table = selected_likert_table
   .objects()
 ```
 
-`{ojs} Inputs.table(selected_likert_table)`
-
-`{ojs} Inputs.table(calc_selected_likert_table)`
-
 ```{ojs}
 Plot.plot({
   marks: [
@@ -1211,8 +1207,7 @@ Plot.plot({
       x: "date_parsed",
       y: "proportion",
       fill: "Grade_descr",
-      order: "Grade_descr",  // keeps stacking consistent
-      reverse: true          // match ggplot reverse stacking
+      order: "Grade"
     }),
     Plot.axisY({ tickFormat: d => `${Math.round(d)}%` }),
     Plot.axisX({ tickRotate: 0, label: "Inspections" })
@@ -1220,6 +1215,11 @@ Plot.plot({
   x: {
   type: "band"
   },
+  y: {
+  label: "",
+  percent: true
+},
+fx: {interval: "month"},
   color: {
     domain: ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent"],
     range: ["#d73027", "#fc8d59", "#fdcc3f", "#c3e648", "#91cf60", "#1a9850"],
