@@ -144,7 +144,7 @@ import { Plot } from "@observablehq/plot"
 
 // Import time parser
 d3 = require("d3@7")
-parser = d3.timeParse("%Y-%m-%d");
+parser = d3.utcParse("%Y-%m-%d");
 
 // Transpose data to make it useable in ojs inputs
 datastore_transposed = transpose(datastore)
@@ -1211,7 +1211,7 @@ calc_selected_likert_table = selected_likert_table
 Plot.plot({
   marks: [
     Plot.barY(calc_selected_likert_table, {
-      x: "month",
+      x: "date_parsed",
       y: "proportion",
       fill: "Grade_descr",
       order: "Grade_descr",  // keeps stacking consistent
@@ -1225,20 +1225,6 @@ Plot.plot({
     range: ["#d73027", "#fc8d59", "#fdcc3f", "#c3e648", "#91cf60", "#1a9850"],
     legend: true,
     legendPosition: "top"
-  },
-  y: {
-    label: "",
-    percent: true
-  },
-  // style applied globally to plot
-  style: {
-    fontSize: "14px", 
-  },
-  width: 800,
-  height: 400,
-  marginTop: 60,
-  marginBottom: 60,
-  marginLeft: 60,
-  marginRight: 20
+  }
 })
 ```
