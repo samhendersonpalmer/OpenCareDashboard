@@ -1205,7 +1205,7 @@ calc_selected_likert_table = selected_likert_table
 `{ojs} Inputs.table(calc_selected_likert_table)`
 
 ```{ojs}
-calc_selected_likert_table ? Plot.plot({
+Plot.plot({
   marks: [
     Plot.barY(calc_selected_likert_table, {
       x: "date_parsed",
@@ -1226,5 +1226,5 @@ calc_selected_likert_table ? Plot.plot({
     legend: true,
     legendPosition: "top"
   }
-}) : null
+})
 ```
