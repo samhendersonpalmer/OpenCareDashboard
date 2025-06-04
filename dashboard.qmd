@@ -1172,7 +1172,7 @@ inspection_history_table = inspection_history
 //| output: false
 
 // --- 1. Selected Service condensed table ---
-selected_likert_table = inspection_history_table
+selected_likert_table = aq.from(inspection_history_table)
   .fold(inspection_history_table.columnNames().slice(4, 17), {
     as: ['Question', 'Grade']
   })
@@ -1186,6 +1186,8 @@ selected_likert_table = inspection_history_table
   })
   .ungroup()
   .dedupe(['Last_inspection_Date', 'Grade_descr'])
+  .derive({ date_test: aq.escape(d => parser(d.Last_inspection_Date)) })
+  .derive({ year_test: aq.escape(d => d3.timeMonth(d.date_test)) })
   
   
   
@@ -1209,7 +1211,7 @@ calc_selected_likert_table = selected_likert_table
 Plot.plot({
   marks: [
     Plot.barY(calc_selected_likert_table, {
-      x: "Last_inspection_Date",
+      x: "year_test",
       y: "proportion",
       fill: "Grade_descr",
       order: "Grade_descr",  // keeps stacking consistent
