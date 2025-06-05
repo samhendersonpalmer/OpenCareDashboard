@@ -1166,7 +1166,6 @@ inspection_history_table = inspection_history
   .filter((d, $) => d.CSNumber === $.selected_CSNumber)
 ```
 
-
 ```{ojs}
 //| echo: false
 //| output: false
