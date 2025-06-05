@@ -20,7 +20,10 @@ library(tidyverse)
 #| include: false
 
 # Find most recent modified file for latest downloaded datastore:
-modified_filenames <- file.info(list.files("Data", full.names = T))
+modified_filenames <- file.info(list.files("Data", full.names = T)) |>  
+  # Have to now exclude the inspection_series data I've added so just datastores searched for
+  filter(
+    !row.names(file.info(list.files("Data", full.names = T))) %in% "Data/inspection_series.rds")
 
 # Locate filename of object most recently modified and adding to object
 latest_datastore <- rownames(modified_filenames)[which.max(modified_filenames$mtime)]
@@ -118,6 +121,9 @@ datastore$MinGrade,
     "No grade yet"
   )
 )
+
+# Read in inspection series file
+inspection_series <- readRDS("Data/inspection_series.rds")
 ```
 
 
@@ -125,6 +131,7 @@ datastore$MinGrade,
 #| echo: false
 #| include: false
 ojs_define(datastore = datastore)
+ojs_define(inspection_series = inspection_series)
 ```
 
 ```{ojs}
@@ -134,6 +141,10 @@ ojs_define(datastore = datastore)
 // Load tidyverse-equivalent OJS library for later reshaping and visualising
 import { aq, op } from '@uwdata/arquero'
 import { Plot } from "@observablehq/plot"
+
+// Import time parser
+d3 = require("d3@7")
+parser = d3.utcParse("%Y-%m-%d");
 
 // Transpose data to make it useable in ojs inputs
 datastore_transposed = transpose(datastore)
@@ -1135,3 +1146,92 @@ Plot.plot({
 
 ```
 :::
+
+# Grade history
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// Use arquero to create dynamic inspection history table
+inspection_history = aq.table(inspection_series)
+
+// Create filtered table for selected service inspection history
+inspection_history_table = inspection_history
+  .params({
+  // define parameters
+    selected_CSNumber: service_selected.CSNumber,
+  })
+  // filter to only include services of the same type
+  .filter((d, $) => d.CSNumber === $.selected_CSNumber)
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+
+// --- 1. Selected Service condensed table ---
+selected_likert_table = aq.from(inspection_history_table)
+  .fold(inspection_history_table.columnNames().slice(4, 17), {
+    as: ['Question', 'Grade']
+  })
+  .derive({
+  Grade_descr: (d) => op.recode(d.Grade, { '1':'Unsatisfactory', '2':'Weak', '3':'Adequate', '4': 'Good', '5': 'Very good',  '6': 'Excellent'}, '?')
+  })
+  .filter(d => d.Grade != null)
+  .groupby('Last_inspection_Date', 'Grade_descr')
+  .derive({
+    count: aq.op.count()
+  })
+  .ungroup()
+  .dedupe(['Last_inspection_Date', 'Grade_descr'])
+  .derive({ date_parsed: aq.escape(d => parser(d.Last_inspection_Date)) })
+  
+// --- 2. Calculate proportions of each grade ---
+calc_selected_likert_table = selected_likert_table
+  .groupby('Last_inspection_Date')
+  .derive({
+    total: aq.op.sum('count')
+  })
+  .derive({
+    proportion: d => d.count / d.total
+  })
+  .objects()
+```
+
+```{ojs}
+Plot.plot({
+marginBottom: 80,
+x: {
+tickFormat: "",
+interval: "month",
+type: "band"
+},
+  marks: [
+    Plot.barY(calc_selected_likert_table, {
+      x: "date_parsed",
+      y: "proportion",
+      fill: "Grade_descr",
+      order: "Grade"
+    }),
+    Plot.axisY({ tickFormat: d => `${Math.round(d)}%` }),
+    Plot.axisX({ tickRotate: 0, label: "Inspections" })
+  ],
+  y: {
+  grid: true,
+  label: "",
+  percent: true
+},
+  color: {
+    domain: ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent"],
+    range: ["#d73027", "#fc8d59", "#fdcc3f", "#c3e648", "#91cf60", "#1a9850"],
+    legend: true,
+    legendPosition: "top"
+  },
+  style: {
+  fontSize: "14px"
+},
+  width: 1000,
+  height: 400
+})
+```
