@@ -19,8 +19,7 @@ latest_url <- function() {
     str_subset("\\.csv")
   
   base_urls_df <-
-    base_urls |>                       # Subset CSV URLs
-    str_replace_all(" ", "%20") %>%
+    base_urls %>%                       # Subset CSV URLs
     paste0("https://www.careinspectorate.com", .) %>%  # Add website prefix
     as.data.frame(nm = "URL")
   
@@ -28,7 +27,7 @@ latest_url <- function() {
     slice(1) %>%
     pull(URL)
   
-  url_name <- dmy(gsub(" ", "_", str_extract(base_urls[1], "(?<=data_).+(?=.csv)")))
+  url_name <- lubridate::ymd(str_extract(base_urls[1], "25.+(?=Data)"))
   
   list("url" = result, "date" = url_name)
 }
