@@ -19,8 +19,7 @@ latest_url <- function() {
     str_subset("\\.csv")
   
   base_urls_df <-
-    base_urls |>                       # Subset CSV URLs
-    str_replace_all(" ", "%20") %>%
+    base_urls %>%                       # Subset CSV URLs
     paste0("https://www.careinspectorate.com", .) %>%  # Add website prefix
     as.data.frame(nm = "URL")
   
