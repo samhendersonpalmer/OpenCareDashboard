@@ -37,8 +37,9 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          if ! git diff --exit-code; then
-              git add --all
-              git commit -m "add data"
-              git push
-          fi
+          git commit -m "add data" -a
+          
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
