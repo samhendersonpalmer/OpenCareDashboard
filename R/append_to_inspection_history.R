@@ -3,7 +3,6 @@
 # script when there is a new datastore file available.
 
 append_to_inspection_history <- function(new_datastore){
-  new_datastore <- download_latest_datastore()
   
   # Clean data --------------------------------------------------------------
   # First select the relevant shared columns
@@ -46,7 +45,9 @@ append_to_inspection_history <- function(new_datastore){
     # to make sure we're only including the information from that most recent inspection
     filter(Publication_of_Latest_Grading > Last_inspection_Date) |> 
     # Remove duplicate entries over datastore series
-    distinct(Publication_of_Latest_Grading, .keep_all = TRUE)
+    distinct(Publication_of_Latest_Grading, .keep_all = TRUE) |> 
+    # Make sure URL is at very end of dataframe for ojs grade history formatting
+    relocate(URL, .after = last_col())
   
   
   # Save data -------------------------------------------------------------
