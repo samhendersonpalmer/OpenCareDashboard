@@ -22,9 +22,16 @@ latest_online_datastore_date <- as.character(latest_url()$date)
 # Download latest datastore if dates don't match --------------------------
 # Source the function to download and save latest datastore object if dates don't match
 source("R/download_latest_datastore.R")
+source("R/append_to_inspection_history.R")
 
 if(latest_local_datastore_date != latest_online_datastore_date){
-  download_latest_datastore()
+  
+  # Download latest datastore and assing to object to update time series
+  new_datastore <- download_latest_datastore()
+  
+  # Append to the inspection series object to continue time series
+  append_to_inspection_history(new_datastore)
+  
 } else {NULL}
 
 
