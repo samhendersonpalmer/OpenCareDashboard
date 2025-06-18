@@ -9,4 +9,6 @@ download_latest_datastore <- function() {
   
   saveRDS(latest_datastore,
           file = paste0("Data/", latest_url_list$date, "_datastore.rds"))
+  
+  return(latest_datastore)
 }
