@@ -1205,24 +1205,31 @@ marginBottom: 80,
 x: {
 tickFormat: "",
 interval: "month",
-type: "band"
+type: "band",
+label: "Date of inspection"
 },
   marks: [
     Plot.barY(calc_selected_likert_table, {
       x: "date_parsed",
       y: "proportion",
       fill: "Grade_descr",
-      order: "Grade"
+      order: "Grade",
+      channels: {
+      'Proportion of all grades': b => `${(b.proportion*100).toFixed(0)}%`,
+      'Date of inspection': "date_parsed", 
+      'Date grades published': "Publication_of_Latest_Grading"},
+      tip: true
     }),
-    Plot.axisY({ tickFormat: d => `${Math.round(d)}%` }),
+    Plot.axisY({ tickFormat: d => `${Math.round(d)}%`, label: ""}),
     Plot.axisX({ tickRotate: 0, label: "Inspections" })
   ],
   y: {
   grid: true,
-  label: "",
+  label: "Proportion of all grades",
   percent: true
 },
   color: {
+  label: "Grade awarded",
     domain: ["Unsatisfactory", "Weak", "Adequate", "Good", "Very good", "Excellent"],
     range: ["#d73027", "#fc8d59", "#fdcc3f", "#c3e648", "#91cf60", "#1a9850"],
     legend: true,
