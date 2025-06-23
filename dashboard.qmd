@@ -1179,6 +1179,29 @@ selected_likert_table = aq.from(inspection_history_table)
   Grade_descr: (d) => op.recode(d.Grade, { '1':'Unsatisfactory', '2':'Weak', '3':'Adequate', '4': 'Good', '5': 'Very good',  '6': 'Excellent'}, '?')
   })
   .filter(d => d.Grade != null)
+  .derive({
+    Question: d => op.replace(d.Question, 'Quality_of_', ' ')
+  })
+  .derive({
+    Question: d => op.replace(d.Question, 'KQ_', ' ')
+  })
+  .derive({
+    Question: d => op.replace(d.Question, /_/g, ' ')
+  })
+  .groupby("CSNumber", "ServiceName", "Publication_of_Latest_Grading", "Last_inspection_Date", "URL","Grade", "Grade_descr")
+  .pivot("Question", "Question")
+  .derive({
+  // Dynamic column selection not permitted so concatenate all rows then filter after
+  Themes: d => op.compact(op.values(op.row_object()))
+  })
+   .derive({
+   // replace the first 7 columns worth of data so only left with concatenated themes
+    Themes: d => op.replace(d.Themes, /(.+?,){7}/, ' '),
+  })
+  .ungroup()
+  // Now need to pivot longer to get back in the right format
+  .fold(aq.not('CSNumber', 'ServiceName', 'Publication_of_Latest_Grading', 'Last_inspection_Date', 'URL', 'Grade', 'Grade_descr', 'Themes'))
+  .filter(d => d.value != null)
   .groupby('Last_inspection_Date', 'Grade_descr')
   .derive({
     count: aq.op.count()
@@ -1244,38 +1267,8 @@ label: "Date of inspection"
 ```
 
 
-```{ojs}
-//| echo: false
-//| output: false
-test_table = aq.from(inspection_history_table)
-  .fold(inspection_history_table.columnNames().slice(4, 17), {
-    as: ['Question', 'Grade']
-  })
-  .derive({
-  Grade_descr: (d) => op.recode(d.Grade, { '1':'Unsatisfactory', '2':'Weak', '3':'Adequate', '4': 'Good', '5': 'Very good',  '6': 'Excellent'}, '?')
-  })
-  .filter(d => d.Grade != null)
-  .derive({
-    Question: d => op.replace(d.Question, 'Quality_of_', ' ')
-  })
-  .derive({
-    Question: d => op.replace(d.Question, 'KQ_', ' ')
-  })
-  .derive({
-    Question: d => op.replace(d.Question, /_/g, ' ')
-  })
-  .groupby("CSNumber", "ServiceName", "Publication_of_Latest_Grading", "Last_inspection_Date", "URL","Grade")
-  .pivot("Question", "Question")
-  .derive({
-  // Dynamic column selection not permitted so concatenate all rows then filter after
-  Themes: d => op.compact(op.values(op.row_object()))
-  })
-   .derive({
-   // replace the first 6 columns worth of data so only left with concatenated themes
-    Themes: d => op.replace(d.Themes, /(.+?,){6}/, ' ')
-  })
-```
+
 
 `{ojs} Inputs.table(selected_likert_table)`
 
-`{ojs} Inputs.table(test_table)`
+`{ojs} Inputs.table(calc_selected_likert_table )`
