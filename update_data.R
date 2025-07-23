@@ -10,7 +10,12 @@ print("1. Checking most recently modified file...")
 modified_filenames <- file.info(list.files("Data", full.names = T))
 
 # Locate filename of object most recently modified and adding to object
-latest_local_datastore <- rownames(modified_filenames)[which.max(modified_filenames$mtime)]
+# Filter out the inspection_series.rds object as this is often modified most recently
+
+filtered <- modified_filenames[rownames(modified_filenames) != "Data/inspection_series.rds", ]
+
+# Then use filtered list to search for most recently modified
+latest_local_datastore <- rownames(filtered)[which.max(filtered$mtime)]
 
 # Extract date from rds string
 latest_local_datastore_date <- sub("Data/(.*)_datastore.rds", "\\1", latest_local_datastore)
