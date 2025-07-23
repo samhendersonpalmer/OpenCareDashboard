@@ -29,7 +29,9 @@ jobs:
           cache-version: 1
 
       - name: Update data
-        run: Rscript update_data.R
+        run: |
+          source("update_data.R")
+        shell: Rscript {0} 
           
       - name: Commit files
         run: |
