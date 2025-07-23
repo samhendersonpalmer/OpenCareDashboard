@@ -5,6 +5,8 @@
 
 # Date of latest locally saved datastore ----------------------------------
 # Find most recent modified file for latest downloaded datastore:
+print("1. Checking most recently modified file...")
+
 modified_filenames <- file.info(list.files("Data", full.names = T))
 
 # Locate filename of object most recently modified and adding to object
@@ -17,6 +19,7 @@ latest_local_datastore_date <- sub("Data/(.*)_datastore.rds", "\\1", latest_loca
 # Find the latest published datastore date --------------------------------
 source("R/latest_url.R")
 
+print("2. Checking most recently published datastore file...")
 latest_online_datastore_date <- as.character(latest_url()$date)
 
 # Download latest datastore if dates don't match --------------------------
@@ -25,6 +28,8 @@ source("R/download_latest_datastore.R")
 source("R/append_to_inspection_history.R")
 
 if(latest_local_datastore_date != latest_online_datastore_date){
+  
+  print("3. Downloading new datastore file...")
   
   # Download latest datastore and assing to object to update time series
   new_datastore <- download_latest_datastore()
