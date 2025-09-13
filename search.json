@@ -24,7 +24,7 @@
     "href": "index.html#notes",
     "title": "OpenCare",
     "section": "Notes",
-    "text": "Notes\nThis dashboard was created using R, Quarto, Observable JavaScript and caffeine, inspired by a series by Melissa Van Bussel.\n\n\n\n\n\n\nDisclaimer\n\n\n\nThis dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0.\nData source",
+    "text": "Notes\nThis dashboard was created using R, Quarto, Observable JavaScript and caffeine, inspired by a series by Melissa Van Bussel.\n\n\n\n\n\n\nNoteDisclaimer\n\n\n\nThis dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0.\nData source",
     "crumbs": [
       "About"
     ]
