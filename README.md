@@ -3,7 +3,7 @@
 
 Search for a care service by name, and see how it’s quality compares
 with its peers across Scotland using public data from the [Care
-Inspectorate](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore).
+Inspectorate](https://www.careinspectorate.com/index.php/publications-statistics/44-public/93-datastore).
 
 The dashboard can be accessed [here](https://samhendersonpalmer.github.io/OpenCareDashboard/).
 
