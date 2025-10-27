@@ -6,7 +6,7 @@ latest_url <- function() {
   library(rvest)
   
   # Front page of datastore
-  base_URL <- "https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore"
+  base_URL <- "https://www.careinspectorate.com/index.php/publications-statistics/44-public/93-datastore"
   
   # Read in URL
   base_pg <- read_html(base_URL)
