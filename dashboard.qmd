@@ -204,7 +204,7 @@ service_selected = filtered_df()
 ## Disclaimer
 This dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0. 
 
-[Data source](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore)
+[Data source](https://www.careinspectorate.com/index.php/publications-statistics/44-public/93-datastore)
 :::
 
 ### Row {height="12%"}
