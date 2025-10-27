@@ -10,7 +10,7 @@ all_urls <- function(month = NULL, year = NULL){
   library(lubridate)
   
   # First datastore page
-  base_URL <- "https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore"
+  base_URL <- "https://www.careinspectorate.com/index.php/publications-statistics/44-public/93-datastore"
   
   # Read in URL
   base_pg <- read_html(base_URL)
@@ -25,7 +25,7 @@ all_urls <- function(month = NULL, year = NULL){
     paste0("https://www.careinspectorate.com", .) # Add website prefix
   
   # Other pages
-  other_URL <- as.list(paste0("https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore?start=", seq(10, 500, by =10)))
+  other_URL <- as.list(paste0("https://www.careinspectorate.com/index.php/publications-statistics/44-public/93-datastore?start=", seq(10, 500, by =10)))
   
   # Get URLS for each csv on all other pages
   other_urls <- lapply(other_URL, function(x) {

@@ -4,7 +4,7 @@ subtitle: compare social care across Scotland <a href='https://samhendersonpalme
 ---
 OpenCare allows anyone to search for a care service and see how its quality compares
 with its peers across Scotland using public data from the [Care
-Inspectorate](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore). Just navigate to the Dashboard on the drop down menu in the sidebar of this page to begin.
+Inspectorate](https://www.careinspectorate.com/index.php/publications-statistics/44-public/93-datastore). Just navigate to the Dashboard on the drop down menu in the sidebar of this page to begin.
 
 ## Preview
 
@@ -19,5 +19,5 @@ This dashboard was created using R, Quarto, Observable JavaScript and caffeine, 
 ## Disclaimer
 This dashboard is not affiliated with or supported by the Care Inspectorate. It contains public sector information licensed under the Open Government Licence v3.0. 
 
-[Data source](https://www.careinspectorate.com/index.php/publications-statistics/93-public/datastore)
+[Data source](https://www.careinspectorate.com/index.php/publications-statistics/44-public/93-datastore)
 :::
