@@ -27,7 +27,7 @@ latest_url <- function() {
     slice(1) %>%
     pull(URL)
   
-  url_name <- lubridate::ymd(str_extract(base_urls[1], "25.+(?=Data)"))
+  url_name <- lubridate::ymd(str_extract(base_urls[1], "26.+(?=Data)"))
   
   list("url" = result, "date" = url_name)
 }
