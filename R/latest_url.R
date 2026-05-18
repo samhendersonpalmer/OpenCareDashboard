@@ -5,30 +5,39 @@ latest_url <- function() {
   library(tidyverse)
   library(rvest)
   
-  # Front page of datastore
-  base_URL <- "https://www.careinspectorate.com/index.php/publications-statistics/44-public/93-datastore"
   
-  # Read in URL
-  base_pg <- read_html(base_URL)
-  
-  # Extract csv URLs on page
-  base_urls <-
-    base_pg %>%
-    html_nodes("a") %>%                           # find all links
-    html_attr("href") %>%                         # get the url
-    str_subset("\\.csv")
-  
-  base_urls_df <-
-    base_urls %>%                       # Subset CSV URLs
-    paste0("https://www.careinspectorate.com", .) %>%  # Add website prefix
-    as.data.frame(nm = "URL")
-  
-  result <- base_urls_df %>%
-    slice(1) %>%
-    pull(URL)
-  
-  url_name <- lubridate::dmy(str_extract(result, "(?=_).+(?=_CSV)") %>%
-                             str_replace_all("_", ""))
-  
-  list("url" = result, "date" = url_name)
+# Front page of datastore
+base_URL <- "https://www.careinspectorate.scot/resources-data/data-and-statistics/datastore"
+
+# Read in URL
+base_pg <- read_html(base_URL)
+
+# Extract URLs on main page
+base_urls <-
+  base_pg %>%
+  html_nodes("a") %>%                           # find all links
+  html_attr("href") %>%                         # get the url
+  str_subset("datastore-")
+
+base_urls_df <-
+  base_urls %>%                       
+  paste0("https://www.careinspectorate.scot", .) %>%  # Add website prefix
+  as.data.frame(nm = "URL")
+
+result <- base_urls_df %>%
+  slice(1) %>%
+  pull(URL)
+
+
+# Extract csv URLs on sub page
+page_url <-
+  read_html(result) %>%
+  html_nodes("a") %>%                           # find all links
+  html_attr("href") %>%                         # get the url
+  str_subset("\\.csv")
+
+url_name <- lubridate::dmy(str_extract(result, "(?<=library/datastore).*") %>%
+                             str_replace_all("-", ""))
+
+list("url" = page_url, "date" = url_name)
 }
