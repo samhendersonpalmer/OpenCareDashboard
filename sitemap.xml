@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://samhendersonpalmer.github.io/OpenCareDashboard/about.html</loc>
-    <lastmod>2026-10-27T15:13:55.853Z</lastmod>
-  </url>
-  <url>
     <loc>https://samhendersonpalmer.github.io/OpenCareDashboard/index.html</loc>
-    <lastmod>2026-10-27T15:13:55.854Z</lastmod>
+    <lastmod>2026-10-28T15:49:56.994Z</lastmod>
   </url>
   <url>
     <loc>https://samhendersonpalmer.github.io/OpenCareDashboard/dashboard.html</loc>
-    <lastmod>2026-10-27T15:13:55.853Z</lastmod>
+    <lastmod>2026-10-28T15:49:56.994Z</lastmod>
+  </url>
+  <url>
+    <loc>https://samhendersonpalmer.github.io/OpenCareDashboard/about.html</loc>
+    <lastmod>2026-10-28T15:49:56.994Z</lastmod>
   </url>
 </urlset>
